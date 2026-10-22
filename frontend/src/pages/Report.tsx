@@ -23,14 +23,14 @@ export default function Report() {
   if (id === "live" && !report) {
     return (
       <div className="calm">
-        This live answer is no longer in memory. <Link to="/">Ask again</Link>.
+        This live answer is no longer in memory. <Link to="/analyst">Ask again</Link>.
       </div>
     );
   }
   if (error) {
     return (
       <div className="error" role="alert">
-        {error} <Link to="/">Back to the examples</Link>
+        {error} <Link to="/analyst">Back to the examples</Link>
       </div>
     );
   }
@@ -38,7 +38,7 @@ export default function Report() {
   return (
     <>
       <p>
-        <Link to="/">← All examples</Link>
+        <Link to="/analyst">← All examples</Link>
       </p>
       <ReportView report={report} />
     </>

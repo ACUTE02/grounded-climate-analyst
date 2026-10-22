@@ -1,0 +1,8 @@
+{
+  "corpus_chunks": {
+    "value": 101,
+    "source_file": "backend/retrieval/corpus_manifest.json",
+    "pointer": "$.total_chunks",
+    "read_on": "2026-10-22"
+  }
+}

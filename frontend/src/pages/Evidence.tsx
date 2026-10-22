@@ -2,43 +2,48 @@ import checkerJson from "../data/checker.json";
 import droughtJson from "../data/drought.json";
 import heatJson from "../data/heat.json";
 import trackaJson from "../data/tracka.json";
-import type { Checker, Drought, Heat, Num, TrackA } from "../data/types";
+import type { Checker, Drought, Heat, TrackA } from "../data/types";
 import { badgeKind } from "../components/HorizonBadges";
+import { N, SrcLine } from "../components/Num";
+import { Table, slm } from "../components/SlmTables";
+import { useState } from "react";
 
 const drought = droughtJson as unknown as Drought;
 const heat = heatJson as unknown as Heat;
 const checker = checkerJson as unknown as Checker;
 const tracka = trackaJson as unknown as TrackA;
 
-/** A number with the file it was read from, always side by side. */
-export function N({ n }: { n: Num | null }) {
-  if (!n) return <span className="muted">not available</span>;
-  return (
-    <span title={`${n.source_file} · ${n.pointer ?? ""} · read on ${n.read_on}`}>
-      <span className="num">{String(n.value)}</span>
-    </span>
-  );
-}
-
-function SrcLine({ file, pointer }: { file: string; pointer?: string }) {
-  return (
-    <p className="src">
-      source: {file}
-      {pointer ? ` · ${pointer}` : ""}
-    </p>
-  );
-}
+const TABS = [
+  { id: "drought", label: "Drought forecasting" },
+  { id: "heat", label: "Heat (null result)" },
+  { id: "retrieval", label: "Retrieval (Track A)" },
+  { id: "checker", label: "Grounding checker" },
+  { id: "slm", label: "SLM" },
+] as const;
+type TabId = (typeof TABS)[number]["id"];
 
 export default function Evidence() {
+  const [tab, setTab] = useState<TabId>("drought");
   const noReproduction = drought.reproduced_file === null;
   return (
     <>
-      <h1>Evidence</h1>
+      <p className="eyebrow">Evidence</p>
+      <h1>What was measured, and where it was read from.</h1>
       <p className="muted" style={{ maxWidth: "64ch" }}>
         Every number on this page is read from a saved result file by a script, and the file is named next
         to it. Hover a number to see the exact place it came from.
       </p>
 
+      <div className="tabs" role="tablist" aria-label="Evidence sections">
+        {TABS.map((x) => (
+          <button key={x.id} role="tab" id={`tab-${x.id}`} aria-selected={tab === x.id} aria-controls="evidence-panel"
+            onClick={() => setTab(x.id)}>
+            {x.label}
+          </button>
+        ))}
+      </div>
+      <div id="evidence-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
+      {tab === "drought" && (
       <section className="card" aria-labelledby="e-drought">
         <h2 id="e-drought">Drought forecast: skill per horizon</h2>
         <p className="muted">
@@ -93,6 +98,8 @@ export default function Evidence() {
         )}
       </section>
 
+      )}
+      {tab === "heat" && (
       <section className="card" aria-labelledby="e-heat">
         <h2 id="e-heat">Heat stress: a null result</h2>
         <p>
@@ -120,7 +127,7 @@ export default function Evidence() {
         ))}
         <SrcLine file={heat.manifest_file} />
         <p style={{ marginTop: 12 }}>
-          A wider search tried <N n={heat.extended_search.cells_tried} /> combinations. The best one
+          A wider search tried <N n={heat.extended_search.cells_tried} /> combinations. The highest-scoring one
           ({heat.extended_search.best_cell.region}, {heat.extended_search.best_cell.target},{" "}
           {heat.extended_search.best_cell.feature_set}, {heat.extended_search.best_cell.horizon}) reached a
           skill of <N n={heat.extended_search.best_cell.skill} />. Anything cleared the bar:{" "}
@@ -129,6 +136,8 @@ export default function Evidence() {
         <SrcLine file={heat.extended_search.file} />
       </section>
 
+      )}
+      {tab === "checker" && (
       <section className="card" aria-labelledby="e-check">
         <h2 id="e-check">The number checker</h2>
         <p className="muted">{checker.what_this_measures}</p>
@@ -155,6 +164,8 @@ export default function Evidence() {
         </div>
       </section>
 
+      )}
+      {tab === "retrieval" && (
       <section className="card" aria-labelledby="e-tracka">
         <h2 id="e-tracka">Track A: finding the right passage</h2>
         <p className="calm">All Track A numbers were {tracka.corpus_note}.</p>
@@ -196,6 +207,24 @@ export default function Evidence() {
           </span>
         </p>
       </section>
+      )}
+      {tab === "slm" && (
+        <>
+          <p className="calm">
+            Quoted from the SLM repository's README with the file and line next to each row. {slm.test_split.text}{" "}
+            <span className="src">({slm.test_split.source_file}, line {slm.test_split.line.value})</span>
+          </p>
+          <p className="small muted">
+            The README does not say which saved checkpoint produced each row, so a row is not claimed to be exactly the
+            published adapter's file. Only the 1.5B SFT adapter is published.
+          </p>
+          <Table title="Model quality" t={slm.model_quality} notes />
+          <Table title="Does the service answer like the evaluator?" t={slm.parity} notes />
+          <Table title="Serving speed: vLLM against the hf backend" t={slm.benchmark} notes />
+          <Table title="Start-up time" t={slm.startup} />
+        </>
+      )}
+      </div>
     </>
   );
 }

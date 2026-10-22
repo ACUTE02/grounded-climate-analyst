@@ -33,7 +33,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("home page", () => {
   it("lists the saved examples and explains that free text is off in demo mode", async () => {
     mockApi((url) => ({ body: url.endsWith("/health") ? demoHealth : examples }));
-    renderAt("/");
+    renderAt("/analyst");
     expect(await screen.findByText("Drought next month, Rajasthan")).toBeInTheDocument();
     expect(screen.getByText("The number checker catching an invented figure")).toBeInTheDocument();
     expect(await screen.findByTestId("demo-explanation")).toHaveTextContent(/only the saved examples/i);
@@ -50,7 +50,7 @@ describe("home page", () => {
         return { status: 409, body: { detail: { code: "demo_free_text_disabled", message, examples: ["drought_one_month"] } } };
       return { status: 404, body: {} };
     });
-    renderAt("/");
+    renderAt("/analyst");
     const box = await screen.findByRole("textbox");
     await waitFor(() => expect(box).toBeEnabled());
     await userEvent.type(box, "will it rain?");
@@ -77,7 +77,7 @@ describe("home page", () => {
       if (url.endsWith("/report") && init?.method === "POST") return { body: written };
       return { status: 404, body: {} };
     });
-    renderAt("/");
+    renderAt("/analyst");
     const box = await screen.findByRole("textbox");
     await waitFor(() => expect(box).toBeEnabled());
     await userEvent.type(box, "will it be dry in Barmer?");
@@ -96,7 +96,7 @@ describe("home page", () => {
       if (init?.method === "POST") return { status: 503, body: { detail: message } };
       return { status: 404, body: {} };
     });
-    renderAt("/");
+    renderAt("/analyst");
     const box = await screen.findByRole("textbox");
     await waitFor(() => expect(box).toBeEnabled());
     await userEvent.type(box, "will it rain?");
@@ -108,7 +108,7 @@ describe("home page", () => {
 
   it("says plainly when the backend cannot be reached", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("network"); }));
-    renderAt("/");
+    renderAt("/analyst");
     expect(await screen.findByText(/backend not reachable/i)).toBeInTheDocument();
     expect(await screen.findByRole("alert")).toHaveTextContent(/Could not reach the backend/);
   });
@@ -120,7 +120,7 @@ describe("report page", () => {
   });
 
   it("always shows the banner, and says when the written report was not generated", async () => {
-    renderAt("/report/drought_one_month");
+    renderAt("/analyst/report/drought_one_month");
     expect(await screen.findByTestId("banner")).toHaveTextContent(/Saved example/);
     expect(screen.getByText(/Not generated in this saved example/)).toBeInTheDocument();
     expect(screen.getByTestId("grounding-status")).toHaveTextContent("not_generated");
@@ -128,7 +128,7 @@ describe("report page", () => {
 
   it("shows an error when an example does not exist", async () => {
     mockApi(() => ({ status: 404, body: { detail: "No saved example 'zzz'." } }));
-    renderAt("/report/zzz");
+    renderAt("/analyst/report/zzz");
     expect(await screen.findByRole("alert")).toHaveTextContent("No saved example 'zzz'.");
   });
 });
@@ -247,9 +247,11 @@ describe("static pages", () => {
   it("Evidence names the corpus for every Track A number and the default search", async () => {
     mockApi(() => ({ body: demoHealth }));
     renderAt("/evidence");
-    expect(await screen.findByRole("heading", { name: "Evidence" })).toBeInTheDocument();
+    expect(await screen.findByRole("tab", { name: "Drought forecasting" })).toHaveAttribute("aria-selected", "true");
+    await userEvent.click(screen.getByRole("tab", { name: "Retrieval (Track A)" }));
     expect(screen.getAllByText(/measured on the original 224-chunk corpus/).length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText(/Plain dense search stays the default/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("tab", { name: "Grounding checker" }));
     expect(screen.getByText(/Known defect/)).toBeInTheDocument();
   });
 
@@ -260,10 +262,9 @@ describe("static pages", () => {
       "The SLM service is optional and is not started by default",
     );
     expect(screen.getByTestId("slm-status")).toHaveTextContent(/does not claim|Nothing on this page claims/);
-    expect(screen.getByRole("link", { name: "GHOSTBHAIYA/climate-slm-1.5b-sft" })).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "GHOSTBHAIYA/climate-slm-1.5b-sft" }).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Only the 1.5B SFT adapter is published/)).toBeInTheDocument();
-    expect(screen.getAllByText("adapter not in this release").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("adapter published").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/not a general chatbot/i)).toBeInTheDocument();
   });
 
   it("SLM Try it: off with the start-up steps when the service is not available", async () => {
@@ -318,6 +319,7 @@ describe("static pages", () => {
     await waitFor(() => expect(button).toBeEnabled());
     await userEvent.click(button);
     expect(await screen.findByTestId("slm-result")).toHaveTextContent("refused: true");
+    await userEvent.type(screen.getByLabelText(/^Question/), "And a second question?");
     await userEvent.click(screen.getByRole("button", { name: "Ask" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("SLM service is not running");
   });
@@ -335,9 +337,125 @@ describe("static pages", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("4000");
   });
 
-  it("About lists what is not included", async () => {
+  it("Evidence SLM tab: the quoted tables say which adapter is published", async () => {
+    mockApi(() => ({ body: demoHealth }));
+    renderAt("/evidence");
+    await userEvent.click(await screen.findByRole("tab", { name: "SLM" }));
+    expect(screen.getAllByText("adapter not in this release").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("adapter published").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("About: limits, licence, repository and adapter links", async () => {
     mockApi(() => ({ body: demoHealth }));
     renderAt("/about");
-    expect(await screen.findByRole("heading", { name: "Not included yet" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Limits" })).toBeInTheDocument();
+    expect(screen.getByText(/chunks\./)).toBeInTheDocument();
+    expect(screen.getAllByText(/licensed under Apache-2.0/i).length).toBeGreaterThanOrEqual(1);
+    const links = screen.getAllByRole("link").map((a) => a.getAttribute("href"));
+    expect(links).toContain("https://github.com/ACUTE02/grounded-climate-analyst");
+    expect(links).toContain("https://huggingface.co/GHOSTBHAIYA/climate-slm-1.5b-sft");
+  });
+});
+
+describe("landing and navigation", () => {
+  it("landing: what it is, two products, how it works, proof points with sources, demo wording, footer", async () => {
+    mockApi(() => ({ body: demoHealth }));
+    renderAt("/");
+    expect(await screen.findByRole("heading", { level: 1 })).toHaveTextContent(/how far to trust each number/);
+    expect(screen.getByText(/no key and no network/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Forecasts with an honest label on every month" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "A small model that answers only from a passage" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "How it works" })).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { level: 3 }).length).toBeGreaterThanOrEqual(5);
+    // every proof number carries its source file in the hover title
+    const proofs = screen.getByRole("heading", { name: "What was measured" }).parentElement!;
+    const sources = proofs.querySelectorAll("span[title]");
+    expect(sources.length).toBeGreaterThanOrEqual(4);
+    sources.forEach((s) => expect(s.getAttribute("title")).toMatch(/\.json/));
+    expect(screen.getByRole("contentinfo")).toHaveTextContent(/Apache-2\.0/);
+    expect(screen.getByRole("contentinfo")).toHaveTextContent(/Open-Meteo/);
+  });
+
+  it("the top navigation links to the five pages and marks the current one", async () => {
+    mockApi(() => ({ body: demoHealth }));
+    renderAt("/evidence");
+    const nav = await screen.findByRole("navigation", { name: "Main" });
+    const names = Array.from(nav.querySelectorAll("a")).map((a) => a.textContent);
+    expect(names).toEqual(["Home", "Analyst", "SLM", "Evidence", "About"]);
+    expect(nav.querySelector('a[aria-current="page"]')).toHaveTextContent("Evidence");
+  });
+
+  it("the landing page product cards lead to /analyst and /slm", async () => {
+    mockApi(() => ({ body: demoHealth }));
+    renderAt("/");
+    const hrefs = (await screen.findAllByRole("link")).map((a) => a.getAttribute("href"));
+    expect(hrefs).toContain("/analyst");
+    expect(hrefs).toContain("/slm");
+  });
+
+  it("an unknown address shows the landing page", async () => {
+    mockApi(() => ({ body: demoHealth }));
+    renderAt("/nothing-here");
+    expect(await screen.findByRole("heading", { name: "How it works" })).toBeInTheDocument();
+  });
+});
+
+describe("SLM chat", () => {
+  const up = { configured: true, available: true, model: "fake-slm", message: "" };
+
+  it("shows each question and answer as a turn, marks a refusal, and shows status and model badges", async () => {
+    let n = 0;
+    mockApi((url, init) => {
+      if (url.endsWith("/slm/status")) return { body: up };
+      if (url.endsWith("/slm/answer") && init?.method === "POST") {
+        n += 1;
+        return { body: n === 1
+          ? { answer: "Rajasthan.", refused: false, model: "fake-slm" }
+          : { answer: "I cannot answer this from the provided context.", refused: true, model: "fake-slm" } };
+      }
+      return { body: demoHealth };
+    });
+    renderAt("/slm");
+    await waitFor(() => expect(screen.getByTestId("slm-state")).toHaveTextContent("service running"));
+    expect(screen.getByTestId("slm-model-badge")).toHaveTextContent("fake-slm");
+    await userEvent.click(screen.getByRole("button", { name: "Ask" }));
+    expect(await screen.findByText("Rajasthan.")).toBeInTheDocument();
+    const box = screen.getByLabelText(/^Question/);
+    await userEvent.type(box, "What is the capital of France?");
+    await userEvent.click(screen.getByRole("button", { name: "Ask" }));
+    const results = await screen.findAllByTestId("slm-result");
+    expect(results).toHaveLength(2);
+    expect(results[1]).toHaveTextContent("I cannot answer this from the provided context.");
+    expect(results[1]).toHaveClass("refusal");
+    expect(results[1]).toHaveTextContent("refused: true");
+    expect(screen.getByText("What is the capital of France?")).toHaveClass("bubble", "q");
+  });
+
+  it("each turn sends the passage as currently edited", async () => {
+    const fetchMock = mockApi((url, init) => {
+      if (url.endsWith("/slm/status")) return { body: up };
+      if (url.endsWith("/slm/answer") && init?.method === "POST") return { body: { answer: "ok", refused: false, model: "fake-slm" } };
+      return { body: demoHealth };
+    });
+    renderAt("/slm");
+    const passage = screen.getByLabelText(/^Passage/);
+    await waitFor(() => expect(passage).toBeEnabled());
+    fireEvent.change(passage, { target: { value: "My own passage." } });
+    await userEvent.click(screen.getByRole("button", { name: "Ask" }));
+    await screen.findByTestId("slm-result");
+    const post = fetchMock.mock.calls.find(([u]) => String(u).endsWith("/slm/answer"))!;
+    expect(JSON.parse(String((post[1] as RequestInit).body)).context).toBe("My own passage.");
+  });
+
+  it("when the service is down the chat is off, the status says so, and the steps are shown", async () => {
+    mockApi((url) => ({
+      body: url.endsWith("/slm/status") ? { configured: false, available: false, model: null, message: "" } : demoHealth,
+    }));
+    renderAt("/slm");
+    expect(await screen.findByTestId("slm-state")).toHaveTextContent("service not running");
+    expect(screen.queryByTestId("slm-model-badge")).toBeNull();
+    expect(screen.getByLabelText(/^Question/)).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Ask" })).toBeDisabled();
+    expect(screen.getByTestId("slm-unavailable")).toHaveTextContent("PHASE5_PORT=8001");
   });
 });

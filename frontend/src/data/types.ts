@@ -111,3 +111,7 @@ export interface Slm {
   limits: Cite[];
   laptop_smoke_test: Cite;
 }
+
+export interface About {
+  corpus_chunks: Num;
+}

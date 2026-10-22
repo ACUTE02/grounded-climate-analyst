@@ -11,7 +11,7 @@ const KIND_TEXT: Record<string, string> = {
   validators_only: "refusals from the system's own checks",
 };
 
-export default function Home() {
+export default function Analyst() {
   const { health, offline } = useShell();
   const navigate = useNavigate();
   const [examples, setExamples] = useState<ExampleItem[] | null>(null);
@@ -37,7 +37,7 @@ export default function Home() {
     setAskError(null);
     try {
       const report = await postReport({ request: question.trim() });
-      navigate("/report/live", { state: { report } });
+      navigate("/analyst/report/live", { state: { report } });
     } catch (e) {
       if (e instanceof ApiError && e.demoRefusal) setRefusal(e.demoRefusal);
       else setAskError(e instanceof Error ? e.message : String(e));
@@ -48,42 +48,17 @@ export default function Home() {
 
   return (
     <>
-      <section style={{ marginBottom: "var(--gap)" }}>
-        <h1>How far can a climate forecast be trusted?</h1>
-        <p className="muted" style={{ maxWidth: "62ch" }}>
-          This analyst covers drought, heat stress and crop impact for Rajasthan and Barmer. Every
-          forecast month carries its own measured test result, every number in a written report is
-          checked against a source, and what the system does not know is stated, not hidden.
-        </p>
-      </section>
+      <p className="eyebrow">Climate Analyst</p>
+      <h1>Ask about drought, heat and crops.</h1>
+      <p className="lede">
+        Covers Rajasthan and Barmer. Each forecast month shows its own measured test result, and a written report
+        lists the numbers it could not trace.
+      </p>
 
-      <section aria-labelledby="h-examples">
-        <h2 id="h-examples">Saved examples</h2>
-        {loadError && (
-          <div className="error" role="alert">
-            Could not load the examples: {loadError}
-          </div>
-        )}
-        {!examples && !loadError && !offline && <p className="muted">Loading…</p>}
-        <div className="grid">
-          {examples?.map((ex) => (
-            <Link key={ex.id} to={`/report/${ex.id}`} className="example-card">
-              <h3>{ex.label}</h3>
-              <span className="muted small">{ex.shows}</span>
-              {ex.kind && (
-                <span className="pill">{KIND_TEXT[ex.kind] ?? ex.kind}</span>
-              )}
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="card" style={{ marginTop: "var(--gap)" }} aria-labelledby="h-ask">
+      <section className="card" aria-labelledby="h-ask">
         <h2 id="h-ask">Ask your own question</h2>
         <form onSubmit={ask}>
-          <label htmlFor="q" className="muted small">
-            Your question
-          </label>
+          <label htmlFor="q">Your question</label>
           <textarea
             id="q"
             value={question}
@@ -103,8 +78,8 @@ export default function Home() {
         </form>
         {demo && (
           <div className="calm" data-testid="demo-explanation">
-            Demo mode answers only the saved examples above, and makes no key or network call. To ask
-            your own question, run the backend in live mode with your own Gemini key.
+            Demo mode answers only the saved examples below, and makes no key or network call. To ask your own
+            question, run the backend in live mode with your own Gemini key (see the README).
           </div>
         )}
         {refusal && (
@@ -115,7 +90,7 @@ export default function Home() {
               {refusal.examples.map((id, i) => (
                 <span key={id}>
                   {i > 0 && ", "}
-                  <Link to={`/report/${id}`}>{id}</Link>
+                  <Link to={`/analyst/report/${id}`}>{id}</Link>
                 </span>
               ))}
             </p>
@@ -126,6 +101,25 @@ export default function Home() {
             {askError}
           </div>
         )}
+      </section>
+
+      <section aria-labelledby="h-examples" className="block">
+        <h2 id="h-examples">Saved examples</h2>
+        {loadError && (
+          <div className="error" role="alert">
+            Could not load the examples: {loadError}
+          </div>
+        )}
+        {!examples && !loadError && !offline && <p className="muted">Loading…</p>}
+        <div className="grid">
+          {examples?.map((ex) => (
+            <Link key={ex.id} to={`/analyst/report/${ex.id}`} className="example-card">
+              <h3>{ex.label}</h3>
+              <span className="muted small">{ex.shows}</span>
+              {ex.kind && <span className="pill">{KIND_TEXT[ex.kind] ?? ex.kind}</span>}
+            </Link>
+          ))}
+        </div>
       </section>
     </>
   );

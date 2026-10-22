@@ -31,8 +31,8 @@ function walk(node: Json, trail: string, parent: Json | undefined, problems: str
 }
 
 describe("src/data", () => {
-  it("has the five evidence files", () => {
-    expect(files.sort()).toEqual(["checker.json", "drought.json", "heat.json", "slm.json", "tracka.json"]);
+  it("has the evidence files (five synced, plus the about numbers)", () => {
+    expect(files.sort()).toEqual(["about.json", "checker.json", "drought.json", "heat.json", "slm.json", "tracka.json"]);
   });
 
   for (const file of files) {
