@@ -33,7 +33,8 @@ This repository holds the backend (Python, FastAPI), the website (React), and a 
 - 📚 **Retrieval over a document corpus (Track A)** — plain dense search is the default; hybrid search and re-ranking were built, measured, and left off
 - 🤖 **Optional small language model step** — asks a fine-tuned 1.5B model about the first retrieved passages; **off by default** and not used to write the report
 - 🧪 **Demo mode** — runs with no key and no network, on six saved examples
-- 🖥️ **Website** — Home, Analyst (saved examples, and free-text questions in live mode), SLM (a chat that answers only from the text it is given), Evidence (each number is read from a saved file) and About
+- 💬 **SLM chat** — ask the small model a question and it answers only from the text it is given: either **the project's own report and source corpus** (pick a saved report, and the backend adds its forecast labels and the best-matching source passages; the default), or **a passage you paste**. Each answer shows which sources it came from, and the model replies "I cannot answer this from the provided context." when the text does not contain the answer. It needs the optional SLM service; how well it answers from the project's material has not been measured
+- 🖥️ **Website** — Home, Analyst (saved examples, and free-text questions in live mode), SLM (the chat above), Evidence (each number is read from a saved file) and About
 
 ## 🏗️ Architecture
 
