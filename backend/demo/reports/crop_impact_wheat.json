@@ -1,0 +1,195 @@
+{
+  "request": "How did heat affect wheat in Rajasthan in February 2006, and what does it mean for yield?",
+  "report": "> **UNVERIFIED FIGURES WARNING.** The following numbers in this report could not be traced to a tool output or a retrieved source: 97. They may be fabricated or misquoted. Every other figure was verified mechanically against source data. Do not rely on the flagged values.\n\n# Summary\n\nThis analysis examines how high temperatures affected wheat crops in Rajasthan during February 2006 and what that heat meant for crop yield. This project's measured data shows that February 2006 experienced severe heat stress, with daily maximum temperatures averaging 5.35 °C above the 1981–2010 baseline normal, although 0 heat wave days were recorded. These figures represent historical observations rather than a forecast, as this system does not possess heat stress forecasting capability.\n\n# How to read this report\n\nEvery figure presented in this report comes from direct historical observations or external cited documents. This project does not produce forecasts for heat stress because rigorous testing against past years showed that heat stress predictions had no usable skill—meaning they performed no better than simply assuming standard seasonal normal conditions. Consequently, all heat stress figures for February 2006 record actual weather that has already occurred. Yield impact benchmarks cited in this report come from official government statements and serve as regionally indicative anchor points rather than scalable local formulas.\n\n# Heat stress\n\nThis system does not forecast heat stress; the figures below are observed conditions recorded in Rajasthan during February 2006:\n\n- **Heat wave days**: 0\n- **Severe heat wave days**: 0\n- **Heat wave spell**: None occurred (`false`)\n- **Highest daily maximum temperature**: 33.4 °C\n- **Average daily maximum temperature departure**: +5.35 °C above the 1981–2010 normal\n\nWhile individual daily peak temperatures reached 33.4 °C (which did not exceed official multi-day heat wave count thresholds), sustained high temperatures throughout the month made February 2006 severely hot overall.\n\n# Crop impact\n\nFor wheat in Rajasthan during February 2006, severe heat was the binding risk. Wheat is particularly sensitive during its terminal heat window (the critical grain-filling period when high temperatures directly disrupt grain development). Drought forecast signals are unavailable for February 2006 because this project's drought model only evaluates forward-looking periods, and February 2006 is in the past.\n\n- **Dominant risk**: Heat (severity classified as severe based on monthly mean maximum temperature departure).\n- **Benchmark yield impact**: 5.6% yield loss.\n- **Source of impact benchmark**: Statement by Bhagirath Choudhary, Union Minister of State for Agriculture and Farmers' Welfare, to the Rajya Sabha on 4 April 2025 (source: [Down To Earth](https://www.downtoearth.org.in/governance/as-told-to-parliament-april-4-2025-heat-stress-caused-56-wheat-yield-loss-in-north-western-plains-in-2021-22)).\n- **Confidence label**: `observed — not a forecast (the Heat Agent has no forecast skill)` — this means the underlying climate signal is an exact physical measurement of past weather, not a predictive model output.\n- **Important caveats**: The 5.6% loss figure is a single historical benchmark and not a validated slope; it must not be scaled per degree (such as assuming a loss of 1.02% per degree for other temperature departures). Additionally, the parliamentary source compared whole-season yields across the entire North Western Plain Zone (NWPZ)—which covers Punjab, Haryana, Delhi, western Uttar Pradesh, and part of Rajasthan—between the 2021–22 and 2020–21 seasons when maximum temperatures were 5.5 °C higher. In contrast, this project measures temperature departure at a specific location against a 1981–2010 daily normal.\n\n# What other organisations are reporting\n\nLive external sources report the following data for their respective tools and timelines:\n\n- **IMD (India Meteorological Department) Extended Range Forecast**: IMD's press release dated 15 October 2026 (covering 15 to 28 October 2026) reports recent weather features, including monsoon withdrawal and an isolated hailstorm in East Rajasthan on 13 October. This document relates to October 2026 and does not cover the historical period of February 2006 (source: [IMD Extended Range Forecast](https://internal.imd.gov.in/section/nhac/dynamic/extended.pdf)).\n- **IMD Seasonal Forecast**: IMD's seasonal forecast page was unavailable (reason given: fetched but only 97 chars of usable text — page structure may have changed).\n- **NASA POWER (Agrometeorology)**: NASA POWER reports historical daily agrometeorological data for Rajasthan (Jaipur centroid at coordinates 26.9, 75.8) aggregated across 28 daily values for February 2006 (source: [NASA POWER](https://power.larc.nasa.gov/)):\n  - **Monthly average 2-metre air temperature**: 22.82 °C\n  - **Monthly total corrected precipitation**: 0.04 mm\n  - **Monthly average shortwave solar irradiance**: 19.4 MJ/m²/day\n  - **Monthly average relative humidity at 2 metres**: 22.49 %\n  - **Monthly average wind speed at 2 metres**: 1.79 m/s\n  - **Monthly average evapotranspiration energy flux**: 0.0 MJ/m²/day\n- **data.gov.in (Mandi Prices)**: data.gov.in daily market prices were unavailable (reason given: no data.gov.in API key is set — set `DATA_GOV_IN_API_KEY`).",
+  "grounding": {
+    "status": "warning",
+    "grounded": false,
+    "total_checked": 33,
+    "unverified_numbers": [
+      "97"
+    ],
+    "report_missing": false,
+    "explanation": "1 of 33 numeric claims could not be traced to any source: 97. They may be fabricated or misquoted. Do not rely on the flagged values."
+  },
+  "horizon_confidence": [],
+  "missing_data": [
+    {
+      "what": "heat stress forecast",
+      "available": false,
+      "reason": "Heat Stress forecasting was tested (mean anomaly, extreme-day anomaly, and heat wave day count, with and without a drought cross-feature) and found to have no usable skill at any horizon. This function reports observed conditions only. See models/heat_region_comparison.md for the full record."
+    },
+    {
+      "what": "IMD outlook: IMD Seasonal Forecast page",
+      "available": false,
+      "reason": "fetched but only 97 chars of usable text — page structure may have changed"
+    }
+  ],
+  "tools_called": [
+    "forecast_heat_stress_risk",
+    "assess_crop_impact",
+    "retrieve_context",
+    "retrieve_context"
+  ],
+  "tool_outputs": {
+    "forecast_heat_stress_risk": {
+      "region": "rajasthan",
+      "month": "2006-02",
+      "heatwave_days": 0,
+      "severe_heatwave_days": 0,
+      "had_heatwave_spell": false,
+      "max_tmax_c": 33.4,
+      "forecast_available": false,
+      "note": "Heat Stress forecasting was tested (mean anomaly, extreme-day anomaly, and heat wave day count, with and without a drought cross-feature) and found to have no usable skill at any horizon. This function reports observed conditions only. See models/heat_region_comparison.md for the full record."
+    },
+    "assess_crop_impact": {
+      "region": "rajasthan",
+      "crop": "wheat",
+      "month": "2006-02",
+      "dominant_risk": "heat",
+      "risk_reasoning": "heat is binding: observed mean daily maximum temperature in 2006-02 ran +5.35 C against the 1981-2010 normal. This is an observation, not a forecast — this system has no heat forecast at all. Wheat is most vulnerable during grain filling (terminal heat window).",
+      "yield_impact_pct": 5.6,
+      "yield_impact_source": "Statement by Bhagirath Choudhary, Union Minister of State for Agriculture and Farmers' Welfare, to the Rajya Sabha, 4 April 2025",
+      "yield_impact_citation": "https://www.downtoearth.org.in/governance/as-told-to-parliament-april-4-2025-heat-stress-caused-56-wheat-yield-loss-in-north-western-plains-in-2021-22",
+      "yield_impact_status": "sourced",
+      "yield_impact_reason": "measured mean_tmax_departure_c of 5.35 falls in the coefficient's band",
+      "yield_impact_caveat": "This is a single anchor point, not a validated slope. It must NOT be scaled per degree: 5.6% at +5.5 C does not license '1.02% per degree' at any other departure. Two further mismatches are stated rather than smoothed over — the source compares one season against the previous season across a whole zone, while this project measures departure from a 1981-2010 day-of-year normal at a single grid point; and the NWPZ covers Punjab, Haryana, Delhi, western Uttar Pradesh and part of Rajasthan, so it is regionally indicative for Jaipur rather than specific to it.",
+      "confidence_label": "observed — not a forecast (the Heat Agent has no forecast skill)",
+      "signals": {
+        "drought": {
+          "available": false,
+          "reason": "2006-02 has already happened, and this system's drought signal is a forecast (t+1 to t+3 from 2024-12), so it cannot describe a past month"
+        },
+        "heat": {
+          "available": true,
+          "observed": true,
+          "month": "2006-02",
+          "heatwave_days": 0,
+          "severe_heatwave_days": 0,
+          "had_heatwave_spell": false,
+          "max_tmax_c": 33.4,
+          "mean_tmax_departure_c": 5.35,
+          "severity": "severe",
+          "severity_route": "monthly mean Tmax departure"
+        }
+      },
+      "narrative": "For Wheat in Rajasthan during February 2006, the binding risk is severe heat. Drought forecast signals are unavailable because February 2006 is a past period, and the system's drought model only evaluates forward-looking forecasts. Heat takes precedent because Wheat is at its most vulnerable during the grain-filling period (the terminal heat window), where high temperatures directly disrupt yield formation.\n\nThe underlying signal represents an observed historical condition, not a forecast. In February 2006, the observed mean daily maximum temperature ran 5.35 °C above the 1981–2010 normal, with maximum temperatures reaching 33.4 °C. This system possesses no heat forecasting capability at any horizon; these figures record past weather that has already occurred and must not be interpreted as a future prediction.\n\nThe benchmark yield impact for this exposure is a 5.6% loss. This figure comes from a parliamentary statement delivered to the Rajya Sabha on 4 April 2025, which reported an average 5.6 per cent yield loss in the North Western Plain Zone (NWPZ) during the 2021–22 season when maximum temperatures rose 5.5 °C compared to 2020–21. \n\nCrucially, this 5.6% loss figure is a single anchor point and not a validated slope. It must not be scaled per degree (such as deriving 1.02% per degree) for other temperature departures. Furthermore, the source metric measures a zone-wide comparison between two consecutive seasons (2021–22 versus 2020–21) across the broader NWPZ (which includes Punjab, Haryana, Delhi, western Uttar Pradesh, and part of Rajasthan), whereas this assessment measures a specific point's departure from a 1981–2010 daily normal. \n\nThe observed temperature departure of 5.35 °C is a direct physical measurement of past conditions, while the 5.6% yield figure serves strictly as a regionally indicative anchor point rather than a local or scalable prediction.",
+      "grounding": {
+        "grounded": true,
+        "unverified_numbers": [],
+        "total_checked": 14,
+        "source_numbers_available": 26
+      },
+      "warnings": []
+    }
+  },
+  "retrieved_sources": [
+    {
+      "source": "IMD FAQ on Heat Wave",
+      "citation": "https://internal.imd.gov.in/section/nhac/dynamic/FAQ_heat_wave.pdf",
+      "section": "",
+      "score": 0.7689
+    },
+    {
+      "source": "IMD FAQ on Heat Wave",
+      "citation": "https://internal.imd.gov.in/section/nhac/dynamic/FAQ_heat_wave.pdf",
+      "section": "",
+      "score": 0.7632
+    },
+    {
+      "source": "IMD FAQ on Heat Wave",
+      "citation": "https://internal.imd.gov.in/section/nhac/dynamic/FAQ_heat_wave.pdf",
+      "section": "",
+      "score": 0.7461
+    },
+    {
+      "source": "IMD FAQ on Heat Wave",
+      "citation": "https://internal.imd.gov.in/section/nhac/dynamic/FAQ_heat_wave.pdf",
+      "section": "",
+      "score": 0.7399
+    },
+    {
+      "source": "IMD FAQ on Heat Wave",
+      "citation": "https://internal.imd.gov.in/section/nhac/dynamic/FAQ_heat_wave.pdf",
+      "section": "",
+      "score": 0.7339
+    },
+    {
+      "source": "Heat Stress — model / region comparison",
+      "citation": "models/heat_region_comparison.md",
+      "section": "Heat Stress — model / region comparison",
+      "score": 0.6913
+    },
+    {
+      "source": "Heat Stress — model / region comparison",
+      "citation": "models/heat_region_comparison.md",
+      "section": "Winter sanity check (Dec-Feb, t+1)",
+      "score": 0.6693
+    },
+    {
+      "source": "Heat Stress — model / region comparison",
+      "citation": "models/heat_region_comparison.md",
+      "section": "Phase 1.1 — new targets and the SPI-3 cross-agent feature",
+      "score": 0.6682
+    },
+    {
+      "source": "Heat Stress — model / region comparison",
+      "citation": "models/heat_region_comparison.md",
+      "section": "The count target is zero-inflated",
+      "score": 0.6673
+    },
+    {
+      "source": "Heat Stress — model / region comparison",
+      "citation": "models/heat_region_comparison.md",
+      "section": "The count target is zero-inflated",
+      "score": 0.6671
+    }
+  ],
+  "external_sources": [
+    {
+      "id": "nasa_power",
+      "title": "NASA POWER agrometeorology (daily, aggregated to the month)",
+      "publisher": "NASA Langley Research Center",
+      "citation": "NASA POWER (Prediction of Worldwide Energy Resources), https://power.larc.nasa.gov/",
+      "available": true,
+      "fetched_at": "2026-10-22T11:50:02+00:00",
+      "excerpt": "NASA POWER daily agrometeorology for Rajasthan (Jaipur centroid) (26.9, 75.8), 2006-02, aggregated over the month: all-sky surface shortwave irradiance: monthly mean 19.4 MJ/m^2/day (from 28 NASA POWER daily values); temperature at 2 m: monthly mean 22.82 C (from 28 NASA POWER daily values); corrected precipitation: monthly total 0.04 mm (from 28 NASA POWER daily values); evapotranspiration energy flux: monthly mean 0.0 MJ/m^2/day (from 28 NASA POWER daily values); relative humidity at 2 m: monthly mean 22.49 % (from 28 NASA POWER daily values); wind speed at 2 m: monthly mean 1.79 m/s (from 28 NASA POWER daily values). Evapotranspiration is reported by NASA POWER as an energy flux in MJ/m^2/day and is not converted here.",
+      "reason": null
+    },
+    {
+      "id": "data_gov_in_mandi",
+      "title": "data.gov.in daily mandi prices",
+      "publisher": "Ministry of Agriculture and Farmers Welfare (via data.gov.in)",
+      "citation": "data.gov.in, 'Current Daily Price of Various Commodities from Various Markets (Mandi)', Ministry of Agriculture and Farmers Welfare — https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070",
+      "available": false,
+      "fetched_at": "2026-10-22T11:50:02+00:00",
+      "excerpt": null,
+      "reason": "no data.gov.in API key is set — set DATA_GOV_IN_API_KEY (a free key comes from https://data.gov.in/apis). The rest of the report is unaffected."
+    }
+  ],
+  "warnings": [
+    "at least one IMD outlook was unavailable",
+    "data_gov_in_mandi unavailable: no data.gov.in API key is set — set DATA_GOV_IN_API_KEY (a free key comes from https://data.gov.in/apis). The rest of the report is unaffected."
+  ],
+  "quota": {},
+  "meta": {
+    "mode": "demo",
+    "saved_example": true,
+    "example_id": "crop_impact_wheat",
+    "generated_at": "2026-10-22T11:51:08+00:00",
+    "how_made": "live_generation",
+    "report_generated": true,
+    "chat_model": "gemini-3.6-flash",
+    "embedding_model": "gemini-embedding-001",
+    "corpus": {
+      "manifest_generated_at": "2026-10-22T11:42:14+00:00",
+      "total_chunks": 101,
+      "embedding_model": "gemini-embedding-001",
+      "sha256_chunks": "45d35b79da9e1e06645d51f113a11bf65cbbd873ec6d090b7cb12276dc5873e8"
+    },
+    "data_current_through": null,
+    "horizon_manifest_source": "generated",
+    "data_source": "snapshot",
+    "banner": "Saved example. Written by the live pipeline on the date in generated_at and saved as it was; asking again can give different text.",
+    "details": null
+  }
+}

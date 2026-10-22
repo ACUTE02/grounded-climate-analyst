@@ -1,0 +1,12 @@
+# Phase 5 serving: what the LAPTOP tests need (the API is tested with a fake backend; no torch, no vllm here).
+# These exact versions ran the tests on the laptop (Python 3.11). On Colab, vLLM brings its own fastapi / pydantic / uvicorn:
+# do NOT `pip install -r` this file in the vLLM runtime. vLLM itself is installed in Colab only (cell P5-0).
+fastapi==0.153.0
+uvicorn==0.54.0
+httpx==0.28.1
+pydantic==2.14.1
+pytest
+pyyaml
+# Laptop only: scripts/phase5_report.py --log-mlflow writes the saved Phase 5 results into the MLflow experiment phase5_serving.
+# Not for the vLLM runtime (mlflow would change its fastapi / pydantic versions); this is the only place mlflow is listed for the laptop.
+mlflow==3.17.1

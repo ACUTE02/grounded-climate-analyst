@@ -1,0 +1,93 @@
+{
+  "manifest_file": "backend/models/heat_manifest.json",
+  "regions": {
+    "rajasthan": [
+      {
+        "horizon": "t+1",
+        "label": "no skill — shown for context only, do not rely on this figure",
+        "skill": {
+          "value": -0.0525,
+          "source_file": "backend/models/heat_manifest.json",
+          "pointer": "regions.rajasthan.horizons[0].skill_score",
+          "read_on": "2026-10-22"
+        }
+      },
+      {
+        "horizon": "t+2",
+        "label": "no skill — shown for context only, do not rely on this figure",
+        "skill": {
+          "value": -0.161,
+          "source_file": "backend/models/heat_manifest.json",
+          "pointer": "regions.rajasthan.horizons[1].skill_score",
+          "read_on": "2026-10-22"
+        }
+      },
+      {
+        "horizon": "t+3",
+        "label": "no skill — shown for context only, do not rely on this figure",
+        "skill": {
+          "value": -0.1631,
+          "source_file": "backend/models/heat_manifest.json",
+          "pointer": "regions.rajasthan.horizons[2].skill_score",
+          "read_on": "2026-10-22"
+        }
+      }
+    ],
+    "barmer": [
+      {
+        "horizon": "t+1",
+        "label": "no skill — shown for context only, do not rely on this figure",
+        "skill": {
+          "value": -0.0209,
+          "source_file": "backend/models/heat_manifest.json",
+          "pointer": "regions.barmer.horizons[0].skill_score",
+          "read_on": "2026-10-22"
+        }
+      },
+      {
+        "horizon": "t+2",
+        "label": "no skill — shown for context only, do not rely on this figure",
+        "skill": {
+          "value": -0.0172,
+          "source_file": "backend/models/heat_manifest.json",
+          "pointer": "regions.barmer.horizons[1].skill_score",
+          "read_on": "2026-10-22"
+        }
+      },
+      {
+        "horizon": "t+3",
+        "label": "no skill — shown for context only, do not rely on this figure",
+        "skill": {
+          "value": -0.0118,
+          "source_file": "backend/models/heat_manifest.json",
+          "pointer": "regions.barmer.horizons[2].skill_score",
+          "read_on": "2026-10-22"
+        }
+      }
+    ]
+  },
+  "extended_search": {
+    "file": "backend/models/heat_phase11.json",
+    "cells_tried": {
+      "value": 12,
+      "source_file": "backend/models/heat_phase11.json",
+      "pointer": "results (length)",
+      "read_on": "2026-10-22"
+    },
+    "best_cell": {
+      "region": "barmer",
+      "target": "heatwave_day_count",
+      "feature_set": "heat+SPI3",
+      "horizon": "t+1",
+      "skill": {
+        "value": 0.0378,
+        "source_file": "backend/models/heat_phase11.json",
+        "pointer": "best_cell.skill_score",
+        "read_on": "2026-10-22"
+      }
+    },
+    "anything_clears_bar": false,
+    "anything_clears_bar_pointer": "anything_clears_bar",
+    "read_on": "2026-10-22"
+  }
+}

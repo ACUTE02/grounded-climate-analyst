@@ -1,0 +1,21 @@
+# For Colab (GPU). torch is NOT listed: Colab already has it and it must not be reinstalled.
+#
+# Pinned = the versions that were installed on the Colab T4 in the Phase 2 / 2c evaluation runs. They are read from
+# the library_versions field of the saved eval files (outputs/eval_base_p_sentence_test.json): transformers 5.18.0,
+# accelerate 1.15.0, peft 0.21.1, huggingface_hub 1.33.0 (torch 2.11.0+cu130, Python 3.13 came with the image).
+# peft was already in the image in those runs but had not been used for training before Phase 3.
+# torchao is NOT used. The Colab image has an old torchao (0.10.0) and peft 0.21.1 needs 0.16.0 or newer, so the
+# import of peft fails. Cell P3-1 runs `pip uninstall -y torchao` before this file is installed.
+transformers==5.18.0
+accelerate==1.15.0
+huggingface_hub==1.33.0
+peft==0.21.1
+datasets>=2.20
+rouge-score>=0.1.2
+pyyaml>=6.0
+#
+# Phase 3 additions. NOT pinned exactly: they were never installed together with the line above, so no
+# working version could be read from a saved file. The first Colab run prints the versions pip chose (cell P3-1) and
+# every training log stores them; pin those numbers here after the first successful run.
+bitsandbytes>=0.45.0
+mlflow>=2.16

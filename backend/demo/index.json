@@ -1,0 +1,89 @@
+{
+  "examples": [
+    {
+      "id": "drought_one_month",
+      "label": "Drought next month, Rajasthan",
+      "shows": "The one forecast horizon this project validated, with its measured skill.",
+      "body": {
+        "request": "What is the drought risk for Rajasthan next month, and how much should I trust it?",
+        "region": "rajasthan",
+        "risk_types": [
+          "drought"
+        ]
+      },
+      "kind": "live_generation",
+      "has_report": true,
+      "file": "drought_one_month.json"
+    },
+    {
+      "id": "drought_no_skill_horizon",
+      "label": "Drought for Barmer, three months, with reliability",
+      "shows": "Per-horizon skill labels, including a horizon with no skill that must not be relied on.",
+      "body": {
+        "request": "What is the drought risk for Barmer over the next three months, and how much should I trust each month's number?",
+        "region": "barmer",
+        "risk_types": [
+          "drought"
+        ]
+      },
+      "kind": "live_generation",
+      "has_report": true,
+      "file": "drought_no_skill_horizon.json"
+    },
+    {
+      "id": "heat_null_result",
+      "label": "Heat stress for Barmer: an honest null result",
+      "shows": "Observed heat only. Forecasting heat stress was tested and has no usable skill, so no forecast is offered.",
+      "body": {
+        "request": "How much heat stress did Barmer see in May 2024, and can you forecast it?",
+        "region": "barmer",
+        "risk_types": [
+          "heat_stress"
+        ],
+        "month": "2024-05"
+      },
+      "kind": "live_generation",
+      "has_report": true,
+      "file": "heat_null_result.json"
+    },
+    {
+      "id": "crop_impact_wheat",
+      "label": "Heat impact on wheat, Feb 2006",
+      "shows": "Which risk binds yield, and the one sourced yield coefficient with its caveat, or an explicit 'no sourced estimate'.",
+      "body": {
+        "request": "How did heat affect wheat in Rajasthan in February 2006, and what does it mean for yield?",
+        "crop": "wheat",
+        "month": "2006-02"
+      },
+      "kind": "live_generation",
+      "has_report": true,
+      "file": "crop_impact_wheat.json"
+    },
+    {
+      "id": "grounding_catch",
+      "label": "The number checker catching an invented figure",
+      "shows": "A figure not found in any source is flagged and named in a warning above the report.",
+      "body": {
+        "request": "What is the one-month drought forecast for Rajasthan?",
+        "region": "rajasthan",
+        "risk_types": [
+          "drought"
+        ]
+      },
+      "kind": "constructed_fixture",
+      "has_report": true,
+      "file": "grounding_catch.json"
+    },
+    {
+      "id": "out_of_scope",
+      "label": "Something the system cannot know",
+      "shows": "Three unsupported asks, each declined rather than invented.",
+      "body": {
+        "request": "Give me the six-month drought forecast for Jaisalmer district and the expected percentage yield loss for mustard there."
+      },
+      "kind": "validators_only",
+      "has_report": false,
+      "file": "out_of_scope.json"
+    }
+  ]
+}

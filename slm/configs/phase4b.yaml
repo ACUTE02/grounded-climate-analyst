@@ -1,0 +1,92 @@
+# Phase 4b: DPO v2. A new experiment, design fixed BEFORE any run (docs/PHASE_4b_DPO_v2.md). v1 (phase4.yaml) stays as it is.
+# Stage A (laptop): the pairs. The loss term, grid and selection below are the fixed design for Stage B; no code reads them yet.
+
+paths:
+  sft_train: data/instruction/sft_train.jsonl
+  sft_val: data/instruction/sft_val.jsonl          # only to check that no val id / chunk enters a pair
+  sft_test: data/instruction/sft_test.jsonl        # only to check that no test id / chunk enters a pair
+  base_train_eval: outputs/eval_base_train.json    # untuned 0.5B, greedy, default prompt, train split (v1 cell P4-0); reused
+  candidates: outputs/dpo2_candidates.json         # rejected-text candidates generated on Colab (cell P4b-0)
+  main_pairs: data/instruction/dpo2_main.jsonl
+  main_sha256: data/instruction/dpo2_main.sha256
+  mix_pairs: data/instruction/dpo2_mix.jsonl
+  mix_sha256: data/instruction/dpo2_mix.sha256
+  summary: data/instruction/dpo2_summary.json
+  # Stage B outputs (kept apart from v1 and Phase 3)
+  adapters_dir: outputs/adapters_dpo2      # <run>/e1, e2, e3
+  runs_dir: outputs/runs_dpo2              # <run>/train_log.json, reference_logps_<set>_seed<k>.json
+  mlruns_dir: outputs/mlruns               # same MLflow file store
+  selection_json: outputs/phase4b_selection.json
+  selection_md: outputs/phase4b_selection.md
+  selection_sha: outputs/phase4b_selection.sha256   # written by select_dpo2 --freeze
+  final_md: outputs/phase4b_final.md
+  test_log: outputs/phase4b_test_runs.json
+
+mlflow:
+  experiment_name: phase4b_dpo2        # same file store as the other phases (outputs/mlruns)
+
+# pair set -> pair file (keys of `paths`), used by the trainer. The sha256 file is checked before every run.
+pair_files:
+  v2-main: {pairs: main_pairs, sha256: main_sha256, tag: main}
+  v2-mix: {pairs: mix_pairs, sha256: mix_sha256, tag: mix}
+
+# Where the rejected texts come from. Only the 21 refusal rows of sft_train are used as prompts (train split only).
+# untuned_greedy is NOT generated again: it is read from the v1 file base_train_eval (same evaluator code path, greedy).
+generation:
+  sources: [untuned_greedy, untuned_sampled, sft_greedy, sft_sampled]     # order matters: the first source that has a text keeps it
+  n_samples: 4                      # sampled outputs per refusal row per model
+  sample_seed: 42                   # sample k uses seed sample_seed + k (same seeds for both models)
+  sampling_mode: qwen_default       # decoding mode of configs/phase2.yaml (temperature 0.7, top_p 0.8, top_k 20)
+  sft_seed: 42                      # the SFT model = the seed-42 start adapter of configs/phase4.yaml
+
+pairs:
+  # chosen = the exact refusal text, rejected = a text that is NOT a refusal (strict AND loose detector of the evaluator).
+  # Type 1 (answer chosen, refusal rejected) only goes into v2-mix. Type 2 stays dropped.
+  mix_seed: 42                      # seed for sampling the type 1 pairs down in v2-mix
+  samples_per_source: 10            # random rejected texts per source printed by --show
+  sample_seed: 42
+
+sets:
+  v2-main: {type1: false}                  # refusal-chosen pairs only
+  v2-mix: {type1: sampled_equal}           # + type 1 pairs, sampled so that answer-chosen lines == refusal-chosen lines
+
+# ---- Stage B design (fixed now, used later) ----
+design:
+  loss: {kind: sigmoid_dpo_plus_nll_chosen, nll: per_token_mean, alphas: [0.5, 1.0]}
+  beta: 0.1
+  learning_rates: [1.0e-5, 2.0e-5]
+  epochs: 3
+  micro_batch_size: 1
+  effective_batch_size: 8                  # amendment 2026-10-20: v2-main has only 80 lines (10 steps/epoch at 8)
+  repeat_seeds: [43, 44]                   # the winning configuration only; seed k starts from the SFT adapter of seed k
+  seed: 42
+  warmup_ratio: 0.1                        # everything else as in v1
+  lr_schedule: cosine
+  weight_decay: 0.0
+  max_grad_norm: 1.0
+  max_seq_len: 2048                        # a pair that does not fit is dropped, never cut
+  dtype: float16
+  grad_scaler_init_scale: 4096
+  skip_if_done: true
+  reference_cache: true                    # reference log-probs saved per pair file and seed, reused by the runs
+  start: sft_adapter_seed_42               # policy and reference = the same SFT adapter
+  grid: {pair_sets: [v2-main, v2-mix], alphas: [0.5, 1.0], learning_rates: [1.0e-5, 2.0e-5]}   # 2 x 2 x 2 = 8 runs, 24 candidates
+  grid_reduction: none                     # a reduction would be written here BEFORE any run
+  selection:
+    min_correct_refusals_val: 7
+    max_median_length_ratio: 1.5           # SFT control median 144 chars -> at most 216
+    max_hit_max_new_tokens: 1
+    no_repetition_loop_beyond_control: true
+    must_beat_control_false_refusals: 3    # fewer than 3/42
+    min_token_f1_val: 0.575
+    round_decimals: 4
+    control_seed: 42                       # the SFT control: seed 42 on val (8/11 strict refusals, 3/42 false refusals, F1 0.615)
+    order:                                 # ranking among the candidates that pass the filter
+      - false_refusals
+      - correct_refusals_strict
+      - token_f1
+      - number_faithfulness
+      - peak_gpu_mem
+      - train_seconds
+      - epoch
+  val_candidates_tried: {v1: 12, v2: 24, total: 36}   # val is no longer a clean check

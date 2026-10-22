@@ -1,0 +1,973 @@
+{
+  "source_file": "Climate-Domain-SLM-publish/README.md",
+  "status": "Evaluation results. The SLM service is optional and is not started by default.",
+  "adapter": {
+    "id": "GHOSTBHAIYA/climate-slm-1.5b-sft",
+    "url": "https://huggingface.co/GHOSTBHAIYA/climate-slm-1.5b-sft",
+    "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
+    "licence": "Apache-2.0",
+    "statement": "Only the 1.5B SFT adapter is published. The 0.5B and DPO adapters are not part of this release."
+  },
+  "model_quality": {
+    "header": "### Model quality",
+    "columns": [
+      "model",
+      "token F1 (95% interval)",
+      "false refusals",
+      "strict correct refusals"
+    ],
+    "rows": [
+      [
+        {
+          "column": "model",
+          "text": "0.5B, untuned",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 117
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "token F1 (95% interval)",
+          "text": "0.542 [0.421, 0.663]",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 117
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "false refusals",
+          "text": "0/32",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 117
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "strict correct refusals",
+          "text": "0/11",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 117
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "0.5B, untuned, \"strict sentence\" prompt",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 118
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "token F1 (95% interval)",
+          "text": "0.670 [0.564, 0.771]",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 118
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "false refusals",
+          "text": "0/32",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 118
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "strict correct refusals",
+          "text": "0/11",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 118
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "0.5B, untuned, few-shot prompt",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 119
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "token F1 (95% interval)",
+          "text": "0.648 [0.545, 0.740]",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 119
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "false refusals",
+          "text": "0/32",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 119
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "strict correct refusals",
+          "text": "0/11",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 119
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "0.5B SFT",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 120
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "token F1 (95% interval)",
+          "text": "0.617 [0.477, 0.743]",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 120
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "false refusals",
+          "text": "4/32",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 120
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "strict correct refusals",
+          "text": "9/11",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 120
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "0.5B DPO v2",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 121
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "token F1 (95% interval)",
+          "text": "0.666 [0.536, 0.784]",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 121
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "false refusals",
+          "text": "2/32",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 121
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "strict correct refusals",
+          "text": "8/11",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 121
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "1.5B, untuned",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 122
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "token F1 (95% interval)",
+          "text": "0.656 [0.579, 0.729]",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 122
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "false refusals",
+          "text": "0/32",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 122
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "strict correct refusals",
+          "text": "6/11",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 122
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "**1.5B SFT**",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 123
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "token F1 (95% interval)",
+          "text": "**0.791 [0.688, 0.882]**",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 123
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "false refusals",
+          "text": "**0/32**",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 123
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "strict correct refusals",
+          "text": "**11/11**",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 123
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "0.5B DPO v1",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 124
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "token F1 (95% interval)",
+          "text": "not run on test",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 124
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "false refusals",
+          "text": "",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 124
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "strict correct refusals",
+          "text": "",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 124
+          },
+          "read_on": "2026-10-22"
+        }
+      ]
+    ]
+  },
+  "parity": {
+    "header": "### Serving: does the service answer like the evaluator?",
+    "columns": [
+      "model",
+      "identical outputs",
+      "token F1 (evaluator → service)",
+      "strict refusals",
+      "false refusals"
+    ],
+    "rows": [
+      [
+        {
+          "column": "model",
+          "text": "0.5B SFT",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 138
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "identical outputs",
+          "text": "52/53",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 138
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "token F1 (evaluator → service)",
+          "text": "0.6154 → 0.6167",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 138
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "strict refusals",
+          "text": "8/11 → 8/11",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 138
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "false refusals",
+          "text": "3/42 → 3/42",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 138
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "0.5B DPO v2",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 139
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "identical outputs",
+          "text": "52/53",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 139
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "token F1 (evaluator → service)",
+          "text": "0.6360 → 0.6420",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 139
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "strict refusals",
+          "text": "8/11 → 8/11",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 139
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "false refusals",
+          "text": "0/42 → 0/42",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 139
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "1.5B SFT",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 140
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "identical outputs",
+          "text": "53/53",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 140
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "token F1 (evaluator → service)",
+          "text": "0.7865 → 0.7865",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 140
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "strict refusals",
+          "text": "9/11 → 9/11",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 140
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "false refusals",
+          "text": "0/42 → 0/42",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 140
+          },
+          "read_on": "2026-10-22"
+        }
+      ]
+    ]
+  },
+  "benchmark": {
+    "header": "### Serving: vLLM against the `hf` backend",
+    "columns": [
+      "model",
+      "concurrency",
+      "vLLM p50 / p95 latency (ms)",
+      "vLLM tokens/s",
+      "hf p50 / p95 latency (ms)",
+      "hf tokens/s"
+    ],
+    "rows": [
+      [
+        {
+          "column": "model",
+          "text": "0.5B SFT",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 150
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "concurrency",
+          "text": "1",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 150
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM p50 / p95 latency (ms)",
+          "text": "577 / 1638",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 150
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM tokens/s",
+          "text": "49.2",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 150
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf p50 / p95 latency (ms)",
+          "text": "1891 / 5326",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 150
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf tokens/s",
+          "text": "14.9",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 150
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "0.5B SFT",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 151
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "concurrency",
+          "text": "16",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 151
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM p50 / p95 latency (ms)",
+          "text": "3076 / 3330",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 151
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM tokens/s",
+          "text": "207.2",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 151
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf p50 / p95 latency (ms)",
+          "text": "8925 / 15097",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 151
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf tokens/s",
+          "text": "50.8",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 151
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "0.5B DPO v2",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 152
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "concurrency",
+          "text": "1",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 152
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM p50 / p95 latency (ms)",
+          "text": "669 / 1703",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 152
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM tokens/s",
+          "text": "49.6",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 152
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf p50 / p95 latency (ms)",
+          "text": "2299 / 5753",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 152
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf tokens/s",
+          "text": "14.3",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 152
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "0.5B DPO v2",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 153
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "concurrency",
+          "text": "16",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 153
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM p50 / p95 latency (ms)",
+          "text": "3139 / 4623",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 153
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM tokens/s",
+          "text": "198.7",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 153
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf p50 / p95 latency (ms)",
+          "text": "11481 / 19546",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 153
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf tokens/s",
+          "text": "47.4",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 153
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "1.5B SFT",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 154
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "concurrency",
+          "text": "1",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 154
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM p50 / p95 latency (ms)",
+          "text": "1201 / 2837",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 154
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM tokens/s",
+          "text": "26.1",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 154
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf p50 / p95 latency (ms)",
+          "text": "2626 / 5962",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 154
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf tokens/s",
+          "text": "11.9",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 154
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "model",
+          "text": "1.5B SFT",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 155
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "concurrency",
+          "text": "16",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 155
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM p50 / p95 latency (ms)",
+          "text": "6012 / 6716",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 155
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "vLLM tokens/s",
+          "text": "96.5",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 155
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf p50 / p95 latency (ms)",
+          "text": "14583 / 20287",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 155
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "hf tokens/s",
+          "text": "35.0",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 155
+          },
+          "read_on": "2026-10-22"
+        }
+      ]
+    ]
+  },
+  "startup": {
+    "header": "**Start-up time**",
+    "columns": [
+      "backend",
+      "0.5B SFT",
+      "0.5B DPO v2",
+      "1.5B SFT"
+    ],
+    "rows": [
+      [
+        {
+          "column": "backend",
+          "text": "vLLM",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 163
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "0.5B SFT",
+          "text": "82 s",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 163
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "0.5B DPO v2",
+          "text": "80 s",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 163
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "1.5B SFT",
+          "text": "92 s",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 163
+          },
+          "read_on": "2026-10-22"
+        }
+      ],
+      [
+        {
+          "column": "backend",
+          "text": "hf",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 164
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "0.5B SFT",
+          "text": "12 s",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 164
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "0.5B DPO v2",
+          "text": "14 s",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 164
+          },
+          "read_on": "2026-10-22"
+        },
+        {
+          "column": "1.5B SFT",
+          "text": "22 s",
+          "source_file": "Climate-Domain-SLM-publish/README.md",
+          "line": {
+            "value": 164
+          },
+          "read_on": "2026-10-22"
+        }
+      ]
+    ]
+  },
+  "test_split": {
+    "text": "All numbers are on the **test split** unless a row says otherwise: 43 items, 32 answerable and 11 refusal items. \"Token F1\" is measured on the answerable items. \"False refusals\" = answerable questions the model refused. \"Strict refusals\" = refusal items where the model gave exactly the right refusal. Intervals are 95% bootstrap intervals over the items.",
+    "source_file": "Climate-Domain-SLM-publish/README.md",
+    "line": {
+      "value": 111
+    },
+    "read_on": "2026-10-22"
+  },
+  "limits": [
+    {
+      "text": "**The dataset is small.** 156 train, 53 validation and 43 test items, and the test split has only **11 refusal items**. The confidence intervals are wide. The differences between the 0.5B SFT and the 0.5B DPO v2 overlap and are **not established**; a single refusal item moves a refusal score by 9 points.",
+      "source_file": "Climate-Domain-SLM-publish/README.md",
+      "line": {
+        "value": 245
+      },
+      "read_on": "2026-10-22"
+    },
+    {
+      "text": "**0.5B SFT vs 0.5B DPO v2**: DPO v2 has fewer false refusals (2/32 against 4/32), one refusal item less (8/11 against 9/11) and a higher F1 (0.666 against 0.617). **All intervals overlap, so none of these differences is established.** The project does not claim that DPO is better than SFT.",
+      "source_file": "Climate-Domain-SLM-publish/README.md",
+      "line": {
+        "value": 127
+      },
+      "read_on": "2026-10-22"
+    },
+    {
+      "text": "**The data was written and checked by the same model family.** Drafts, test drafts and the verification pass all come from LLMs of one family; only a spot-check was done by a human, and refusal items are the weakest part of that check. In the training-pool sample the human and the AI verifier disagreed on 6 of 30 rows (0.20), on 2 of 12 test rows (0.17); the stop rule had a limit of 0.20, and it was passed on purpose by the project reviewer. This is not a fully human-reviewed dataset. One source (the NDMA drought guidelines) supplies 109 of the 252 items.",
+      "source_file": "Climate-Domain-SLM-publish/README.md",
+      "line": {
+        "value": 246
+      },
+      "read_on": "2026-10-22"
+    },
+    {
+      "text": "**The benchmark is narrow.** It ran on a free Colab T4, with micro-batching in front of vLLM's offline engine (not vLLM's own asynchronous engine), on 53 validation prompts, 3 repeats. The `hf` backend used a maximum batch of 8, vLLM 16. vLLM's GPU memory is a reserved pool, and vLLM counts one end-of-answer token more per answer than the `hf` backend. The strongest sentence this supports: *vLLM is about 3 to 4 times faster than `hf` on this T4 with this service wrapper (0.5B models; about 2 to 3 times for the 1.5B model).* It says nothing about production load, and it is not the best case for vLLM.",
+      "source_file": "Climate-Domain-SLM-publish/README.md",
+      "line": {
+        "value": 249
+      },
+      "read_on": "2026-10-22"
+    },
+    {
+      "text": "**DPO v1 failed**: the models copied the context instead of refusing. **DPO v2 changed several things at once** (balanced pairs, an NLL term, new rejected texts), so this project cannot say which change fixed it. 78 of the 80 rejected texts came from the untuned model, not from the SFT model (off-policy). The weight of the NLL term (0.5 against 1) made no visible difference. **36 validation candidates were tried in total for the DPO choice, so the validation set was not a clean check for it.**",
+      "source_file": "Climate-Domain-SLM-publish/README.md",
+      "line": {
+        "value": 247
+      },
+      "read_on": "2026-10-22"
+    }
+  ],
+  "laptop_smoke_test": {
+    "text": "> On the author's laptop (RTX 3050 Laptop GPU, 4 GB, Windows, hf backend, one model per process), all three models were started and given two test requests each: one answerable question and one question the passage cannot answer. All three models answered the first from the passage and replied with the exact refusal sentence to the second (refused = true). The 1.5B model loaded and ran on the 4 GB card without a CUDA out-of-memory error. This is a two-request smoke test, not a benchmark and not an accuracy measurement. The vLLM backend was not tried on the laptop, because vLLM does not run on native Windows.",
+    "source_file": "Climate-Domain-SLM-publish/README.md",
+    "line": {
+      "value": 170
+    },
+    "read_on": "2026-10-22"
+  }
+}

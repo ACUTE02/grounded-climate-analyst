@@ -1,0 +1,57 @@
+{
+  "request": "Give me the six-month drought forecast for Jaisalmer district and the expected percentage yield loss for mustard there.",
+  "report": "",
+  "grounding": {
+    "status": "not_generated",
+    "grounded": false,
+    "total_checked": 0,
+    "unverified_numbers": [],
+    "report_missing": true,
+    "explanation": "No report was produced, so there was nothing to verify. Zero numbers checked is not a pass."
+  },
+  "horizon_confidence": [],
+  "missing_data": [
+    {
+      "what": "district-level drought forecast for Jaisalmer",
+      "available": false,
+      "reason": "Unsupported region 'jaisalmer'. Supported: ['rajasthan', 'barmer']"
+    },
+    {
+      "what": "six-month drought forecast",
+      "available": false,
+      "reason": "this system's drought forecast covers t+1, t+2, t+3 only (the horizons in the horizon manifest)"
+    },
+    {
+      "what": "yield-loss estimate for mustard",
+      "available": false,
+      "reason": "Unknown crop 'mustard'. Supported: bajra, wheat."
+    }
+  ],
+  "tools_called": [],
+  "tool_outputs": {},
+  "retrieved_sources": [],
+  "external_sources": [],
+  "warnings": [
+    "validators_only: these refusals come from the region, crop and horizon checks, not from a written report"
+  ],
+  "quota": {},
+  "meta": {
+    "mode": "demo",
+    "saved_example": true,
+    "example_id": "out_of_scope",
+    "generated_at": "2026-10-22T12:03:03+00:00",
+    "how_made": "validators_only",
+    "report_generated": false,
+    "chat_model": null,
+    "embedding_model": null,
+    "corpus": null,
+    "data_current_through": null,
+    "horizon_manifest_source": "generated",
+    "data_source": "snapshot",
+    "banner": "Saved example, not written by the live model. These refusals come from the system's own region, crop and horizon checks; there is no written report for this example.",
+    "details": {
+      "live_written": false,
+      "note": "A live written report was tried and could not be made (the daily Gemini quota was used up), so this example stays on the refusals from the system's own checks."
+    }
+  }
+}

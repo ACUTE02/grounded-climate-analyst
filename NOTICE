@@ -1,0 +1,47 @@
+Climate Suite
+Copyright 2026 Ayushmaan Gupta
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+If you reuse this work, please credit Ayushmaan Gupta and link back to the repository:
+https://github.com/ACUTE02/grounded-climate-analyst
+
+Third-party material used or referred to by this project. The data files in backend/data_snapshot/ are
+NOT under the Apache licence of the code: each keeps the terms of its source, and the wording below is
+taken from the source pages (read on 2026-10-22).
+
+1. Weather data (backend/data_snapshot/*_raw.parquet and *_daily.parquet)
+   Weather data by Open-Meteo.com (https://open-meteo.com/), licensed Creative Commons Attribution 4.0
+   International (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/ (terms: https://open-meteo.com/en/terms,
+   licence: https://open-meteo.com/en/licence). Changes: the daily values were aggregated to monthly and
+   columns were renamed. Open-Meteo's terms say: "You may only use the free API services for non-commercial
+   purposes." The files were fetched through the free API; `setup --refetch` uses it again.
+   Open-Meteo describes its Historical Weather API as based on reanalysis datasets with ERA5 as the main one
+   (https://open-meteo.com/en/docs/historical-weather-api). Under the Licence to Use Copernicus Products
+   (https://cds.climate.copernicus.eu/licences/licence-to-use-copernicus-products) modified products carry:
+   "Contains modified Copernicus Climate Change Service information 2026", and the statement that neither the
+   European Commission nor ECMWF is responsible for any use that may be made of the Copernicus information.
+   ERA5 dataset (CC-BY licence per its page): doi:10.24381/cds.adbb2d47.
+
+2. ENSO series, ONI (backend/data_snapshot/oni_series.parquet)
+   Obtained from the NOAA Physical Sciences Laboratory. Data provided by the NOAA/OAR/PSL, Boulder, Colorado,
+   USA, from their Web site at https://psl.noaa.gov/. PSL: "The information on government servers are in the
+   public domain, unless specifically annotated otherwise" (https://psl.noaa.gov/disclaimer/); PSL's data are
+   provided "as is" and no NOAA endorsement may be implied. PSL lists the ONI as from NOAA CPC, a three-month
+   running mean of NOAA ERSST.V5 anomalies in the Nino 3.4 region.
+
+3. Indian Ocean Dipole, DMI (backend/data_snapshot/iod_series.parquet)
+   Created at NOAA PSL ("DMI HadISST1.1" in the file header), from HadISST1.1:
+   HadISST data were obtained from https://www.metoffice.gov.uk/hadobs/hadisst/ and are (c) British Crown
+   Copyright, Met Office, 2003 (year taken from the Rayner et al. 2003 citation; the Met Office page asks for
+   the year of first publication), provided under an Open Government Licence
+   (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/; terms:
+   https://www.metoffice.gov.uk/hadobs/hadisst/terms_and_conditions.html).
+   Citation: Rayner, N. A., Parker, D. E., Horton, E. B., Folland, C. K., Alexander, L. V., Rowell, D. P.,
+   Kent, E. C., Kaplan, A. (2003), Global analyses of sea surface temperature, sea ice, and night marine air
+   temperature since the late nineteenth century, J. Geophys. Res. 108(D14), 4407, doi:10.1029/2002JD002670.
+
+4. Models (not stored in this repository)
+   Base model Qwen/Qwen2.5-1.5B-Instruct (Apache-2.0) and the LoRA adapter GHOSTBHAIYA/climate-slm-1.5b-sft
+   (Apache-2.0, https://huggingface.co/GHOSTBHAIYA/climate-slm-1.5b-sft), downloaded from Hugging Face when the
+   small language model service loads them.

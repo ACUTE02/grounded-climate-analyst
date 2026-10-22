@@ -1,0 +1,104 @@
+# Phase 3 config: SFT with LoRA / QLoRA. Written BEFORE any run. Nothing in the sweep or the selection rule
+# is changed after results exist. The refusal text, system prompt and eval settings stay in phase1/phase2.yaml.
+
+paths:
+  outputs_dir: outputs
+  adapters_dir: outputs/adapters        # <run>/e1, e2, e3  (adapter files only, never the base model)
+  runs_dir: outputs/runs                # <run>/train_log.json (what the select step reads for costs)
+  mlruns_dir: outputs/mlruns            # MLflow file store, no server
+  selection_json: outputs/phase3_selection.json
+  selection_md: outputs/phase3_selection.md
+  selection_sha: outputs/phase3_selection.sha256   # written by select_best --freeze
+  final_md: outputs/phase3_final.md     # val + test tables, written after the test runs
+  test_log: outputs/phase3_test_runs.json
+
+mlflow:
+  experiment_name: phase3_sft
+
+# Two model sizes. `main` is the sweep. `q15` is the one extra run of the addendum, with the winning method and
+# learning rate of the 0.5B grid (resolved from the saved selection file). Run name = run_prefix + the name.
+arms:
+  main:
+    label: "0.5B"
+    model_id: Qwen/Qwen2.5-0.5B-Instruct
+    run_prefix: ""
+    gradient_checkpointing: false
+    base_eval_name: base                # name of the saved eval files of the untuned model
+  q15:
+    label: "1.5B"
+    model_id: Qwen/Qwen2.5-1.5B-Instruct
+    run_prefix: "q15_"
+    gradient_checkpointing: true        # 1.5B: switched on so that micro-batches of 2 fit a 15 GB T4 with a margin
+    base_eval_name: base15
+
+sweep:
+  methods: [lora_fp16, qlora_4bit]
+  learning_rates: [1.0e-4, 2.0e-4]
+  seed: 42
+  repeat_seeds: [43, 44]                # the winning configuration only
+
+methods:
+  lora_fp16:
+    description: base in float16, LoRA adapters trained in float32
+    quantize: null
+  qlora_4bit:
+    description: base in 4-bit nf4 (double quant, float16 compute), LoRA adapters trained in float32
+    quantize: nf4
+    double_quant: true
+    compute_dtype: float16              # T4 has no usable bf16
+    prepare_kbit: true                  # peft.prepare_model_for_kbit_training
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  bias: none
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+
+train:
+  epochs: 3                             # one adapter is saved after EVERY epoch
+  effective_batch_size: 16
+  micro_batch_size: 2                   # rows per forward pass; gradient accumulation = 16 / 2 = 8
+  warmup_ratio: 0.1
+  lr_schedule: cosine
+  weight_decay: 0.0
+  max_grad_norm: 1.0
+  max_seq_len: 2048                     # prompt + completion tokens. A row that does not fit is dropped (never cut).
+  refusal_repeat: 1                     # 2 = every refusal train row used twice. Only run it if told to.
+  skip_if_done: true                    # a run whose adapter folders and log exist is skipped (Colab may disconnect)
+  dtype: float16
+  grad_scaler_init_scale: 4096          # float16 loss scaling starts here (the library default 65536 can skip the first
+                                        # steps to overflow, and a run has only 30 optimiser steps)
+
+# Selection rule: applied after the runs, on VAL only (see climate_slm/training/select_best.py).
+selection:
+  max_false_refusals_val: 4             # step 1: keep only candidates with at most 4 of 42 false refusals on val
+  round_decimals: 4                     # F1 and faithfulness are compared after rounding to this many decimals
+  order:                                # steps 2 to 5; every step is "higher is better" except the cost steps
+    - correct_refusals_strict
+    - token_f1
+    - number_faithfulness
+    - peak_gpu_mem                      # step 5: the cheaper method (lower peak memory,
+    - trainable_params                  #         then fewer trainable parameters,
+    - train_seconds                     #         then shorter training time)
+    - epoch                             # last resort: the earlier epoch (less training)
+
+# The 7 pass criteria approved by the owner before training (2026-10-18).
+criteria:
+  min_correct_refusals: 7               # of 11, strict, on test and on val
+  max_false_refusals: {val: 4, test: 3} # of 42 / of 32
+  f1_target_test: 0.60                  # the base values (0.542 / 0.575) are read from the saved base eval files
+  min_number_faithfulness: 0.95
+  max_hit_max_new_tokens: 1
+  loop_ngram: 4                         # a "repetition loop" = one 4-word sequence repeated at least 4 times in one output
+  loop_min_repeats: 4
+
+# Tables: runs shown next to the tuned models (saved eval files of Phase 2 / 2c, nothing is run for them)
+tables:
+  decimals: 3
+  baselines:                            # (eval run name, label)
+    - [base, "base 0.5B (default prompt)"]
+    - [base_p_sentence, "base 0.5B, strict_sentence prompt"]
+    - [base_p_fewshot, "base 0.5B, fewshot prompt"]
+  prompted_baselines: [base_p_sentence, base_p_fewshot]
+  base_reference: base                  # criterion 3 compares with this run

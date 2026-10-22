@@ -1,0 +1,265 @@
+{
+  "about": "The input data behind the saved evidence, copied byte for byte. `python -m scripts.setup` restores these files; `--refetch` fetches fresh data from the network instead.",
+  "built_at": "2026-10-22T11:10:43+00:00",
+  "total_bytes": 541023,
+  "attribution": [
+    "Weather data by Open-Meteo.com (https://open-meteo.com/)",
+    "Data from the NOAA Physical Sciences Laboratory (PSL), https://psl.noaa.gov/"
+  ],
+  "files": [
+    {
+      "kind": "weather_monthly",
+      "region": "rajasthan",
+      "source": {
+        "name": "Open-Meteo Historical Weather API",
+        "url": "https://archive-api.open-meteo.com/v1/archive",
+        "request": {
+          "latitude": 26.9,
+          "longitude": 75.8,
+          "start_date": "1980-01-01",
+          "end_date": "2024-12-31",
+          "daily": [
+            "temperature_2m_mean",
+            "temperature_2m_max",
+            "temperature_2m_min",
+            "precipitation_sum"
+          ],
+          "hourly": [
+            "soil_moisture_0_to_7cm"
+          ],
+          "timezone": "GMT",
+          "chunk_years": 10
+        }
+      },
+      "transformation": "Modified: daily values aggregated to monthly. temp_c, tmax_c and tmin_c are the monthly mean of the daily temperature_2m_mean, _max and _min; rainfall_mm is the monthly sum of the daily precipitation_sum; soil_moisture is the monthly mean of the hourly soil_moisture_0_to_7cm.",
+      "attribution": "Weather data by Open-Meteo.com (https://open-meteo.com/)",
+      "licence": {
+        "name": "CC BY 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/",
+        "terms_url": "https://open-meteo.com/en/terms",
+        "note": "The free API may only be used for non-commercial purposes (https://open-meteo.com/en/terms). Attribution, the licence link and a statement of changes are required by CC BY 4.0. Modified Copernicus information carries its own attribution: see NOTICE.",
+        "terms_read": "Terms and licence pages read on 2026-10-22; see NOTICE."
+      },
+      "file": "rajasthan_raw.parquet",
+      "restores_to": "backend/data/raw/rajasthan_raw.parquet",
+      "sha256": "2cdd5717f45479fdcd7cc59bd3db498113a158d7c7f8267ded39d434cbcbd0aa",
+      "size_bytes": 28621,
+      "fetch_date": "2026-08-17",
+      "fetch_date_basis": "UTC date of the modification time of the file in the folder it was copied from; the file is written when it is fetched, but this is not a date recorded by the fetch itself",
+      "rows": 540,
+      "columns": [
+        "temp_c",
+        "tmax_c",
+        "tmin_c",
+        "rainfall_mm",
+        "soil_moisture"
+      ],
+      "first": "1980-01-01",
+      "last": "2024-12-01"
+    },
+    {
+      "kind": "weather_daily",
+      "region": "rajasthan",
+      "source": {
+        "name": "Open-Meteo Historical Weather API",
+        "url": "https://archive-api.open-meteo.com/v1/archive",
+        "request": {
+          "latitude": 26.9,
+          "longitude": 75.8,
+          "start_date": "1980-01-01",
+          "end_date": "2024-12-31",
+          "daily": [
+            "temperature_2m_mean",
+            "temperature_2m_max",
+            "temperature_2m_min",
+            "precipitation_sum"
+          ],
+          "hourly": [
+            "soil_moisture_0_to_7cm"
+          ],
+          "timezone": "GMT",
+          "chunk_years": 10
+        }
+      },
+      "transformation": "Modified: columns renamed (temperature_2m_mean -> temp_c, _max -> tmax_c, _min -> tmin_c, precipitation_sum -> rainfall_mm); daily values are not aggregated; soil moisture is not included.",
+      "attribution": "Weather data by Open-Meteo.com (https://open-meteo.com/)",
+      "licence": {
+        "name": "CC BY 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/",
+        "terms_url": "https://open-meteo.com/en/terms",
+        "note": "The free API may only be used for non-commercial purposes (https://open-meteo.com/en/terms). Attribution, the licence link and a statement of changes are required by CC BY 4.0. Modified Copernicus information carries its own attribution: see NOTICE.",
+        "terms_read": "Terms and licence pages read on 2026-10-22; see NOTICE."
+      },
+      "file": "rajasthan_daily.parquet",
+      "restores_to": "backend/data/raw/rajasthan_daily.parquet",
+      "sha256": "ffcb20ae2bc1d275f177bc6c9753a2d81758c90d91800487e380ee0996b71b6d",
+      "size_bytes": 224219,
+      "fetch_date": "2026-08-17",
+      "fetch_date_basis": "UTC date of the modification time of the file in the folder it was copied from; the file is written when it is fetched, but this is not a date recorded by the fetch itself",
+      "rows": 16437,
+      "columns": [
+        "temp_c",
+        "tmax_c",
+        "tmin_c",
+        "rainfall_mm"
+      ],
+      "first": "1980-01-01",
+      "last": "2024-12-31"
+    },
+    {
+      "kind": "weather_monthly",
+      "region": "barmer",
+      "source": {
+        "name": "Open-Meteo Historical Weather API",
+        "url": "https://archive-api.open-meteo.com/v1/archive",
+        "request": {
+          "latitude": 25.75,
+          "longitude": 71.38,
+          "start_date": "1980-01-01",
+          "end_date": "2024-12-31",
+          "daily": [
+            "temperature_2m_mean",
+            "temperature_2m_max",
+            "temperature_2m_min",
+            "precipitation_sum"
+          ],
+          "hourly": [
+            "soil_moisture_0_to_7cm"
+          ],
+          "timezone": "GMT",
+          "chunk_years": 10
+        }
+      },
+      "transformation": "Modified: daily values aggregated to monthly. temp_c, tmax_c and tmin_c are the monthly mean of the daily temperature_2m_mean, _max and _min; rainfall_mm is the monthly sum of the daily precipitation_sum; soil_moisture is the monthly mean of the hourly soil_moisture_0_to_7cm.",
+      "attribution": "Weather data by Open-Meteo.com (https://open-meteo.com/)",
+      "licence": {
+        "name": "CC BY 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/",
+        "terms_url": "https://open-meteo.com/en/terms",
+        "note": "The free API may only be used for non-commercial purposes (https://open-meteo.com/en/terms). Attribution, the licence link and a statement of changes are required by CC BY 4.0. Modified Copernicus information carries its own attribution: see NOTICE.",
+        "terms_read": "Terms and licence pages read on 2026-10-22; see NOTICE."
+      },
+      "file": "barmer_raw.parquet",
+      "restores_to": "backend/data/raw/barmer_raw.parquet",
+      "sha256": "3dc86aa94f59bc251ec3072fce05879e4953072f6e1d0892493ecd15d21dad9b",
+      "size_bytes": 27853,
+      "fetch_date": "2026-08-17",
+      "fetch_date_basis": "UTC date of the modification time of the file in the folder it was copied from; the file is written when it is fetched, but this is not a date recorded by the fetch itself",
+      "rows": 540,
+      "columns": [
+        "temp_c",
+        "tmax_c",
+        "tmin_c",
+        "rainfall_mm",
+        "soil_moisture"
+      ],
+      "first": "1980-01-01",
+      "last": "2024-12-01"
+    },
+    {
+      "kind": "weather_daily",
+      "region": "barmer",
+      "source": {
+        "name": "Open-Meteo Historical Weather API",
+        "url": "https://archive-api.open-meteo.com/v1/archive",
+        "request": {
+          "latitude": 25.75,
+          "longitude": 71.38,
+          "start_date": "1980-01-01",
+          "end_date": "2024-12-31",
+          "daily": [
+            "temperature_2m_mean",
+            "temperature_2m_max",
+            "temperature_2m_min",
+            "precipitation_sum"
+          ],
+          "hourly": [
+            "soil_moisture_0_to_7cm"
+          ],
+          "timezone": "GMT",
+          "chunk_years": 10
+        }
+      },
+      "transformation": "Modified: columns renamed (temperature_2m_mean -> temp_c, _max -> tmax_c, _min -> tmin_c, precipitation_sum -> rainfall_mm); daily values are not aggregated; soil moisture is not included.",
+      "attribution": "Weather data by Open-Meteo.com (https://open-meteo.com/)",
+      "licence": {
+        "name": "CC BY 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/",
+        "terms_url": "https://open-meteo.com/en/terms",
+        "note": "The free API may only be used for non-commercial purposes (https://open-meteo.com/en/terms). Attribution, the licence link and a statement of changes are required by CC BY 4.0. Modified Copernicus information carries its own attribution: see NOTICE.",
+        "terms_read": "Terms and licence pages read on 2026-10-22; see NOTICE."
+      },
+      "file": "barmer_daily.parquet",
+      "restores_to": "backend/data/raw/barmer_daily.parquet",
+      "sha256": "5e6411fba952c48553d54021f0c92167c76391b8f38e53d57fa856a7e56142e0",
+      "size_bytes": 220712,
+      "fetch_date": "2026-08-17",
+      "fetch_date_basis": "UTC date of the modification time of the file in the folder it was copied from; the file is written when it is fetched, but this is not a date recorded by the fetch itself",
+      "rows": 16437,
+      "columns": [
+        "temp_c",
+        "tmax_c",
+        "tmin_c",
+        "rainfall_mm"
+      ],
+      "first": "1980-01-01",
+      "last": "2024-12-31"
+    },
+    {
+      "kind": "oni",
+      "source": {
+        "name": "Oceanic Nino Index (ONI), NOAA",
+        "url": "https://psl.noaa.gov/data/correlation/oni.data",
+        "fallback_url": "https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt",
+        "which_url_was_used": "unknown (the code tries the first and falls back to the second; the choice was not recorded)"
+      },
+      "transformation": "Parsed into a monthly series from NOAA's year-per-row ASCII grid (or the CPC seasonal table). Values are NOAA's 3-month running mean; the series is revised at the source.",
+      "attribution": "Data provided by the NOAA/OAR/PSL, Boulder, Colorado, USA, from their Web site at https://psl.noaa.gov/",
+      "licence": {
+        "name": "NOAA PSL: public domain unless annotated otherwise",
+        "url": "https://psl.noaa.gov/disclaimer/",
+        "note": "Terms read on 2026-10-22; data are provided 'as is'; no NOAA endorsement may be implied."
+      },
+      "file": "oni_series.parquet",
+      "restores_to": "backend/models/oni_series.parquet",
+      "sha256": "dcab8b27c48131bb8ff53b5cdfc14678db32378ca71f0a6ab17e3ddf8cfc17c1",
+      "size_bytes": 12963,
+      "fetch_date": "2026-08-19",
+      "fetch_date_basis": "UTC date of the modification time of the file in the folder it was copied from; the file is written when it is fetched, but this is not a date recorded by the fetch itself",
+      "rows": 918,
+      "columns": [
+        "oni"
+      ],
+      "first": "1950-01-01",
+      "last": "2026-06-01"
+    },
+    {
+      "kind": "iod",
+      "source": {
+        "name": "Dipole Mode Index (DMI, HadISST1.1), NOAA PSL",
+        "url": "https://psl.noaa.gov/data/timeseries/month/data/dmi.had.long.data",
+        "fallback_url": "https://psl.noaa.gov/data/timeseries/month/data/dmi.had.long.csv",
+        "which_url_was_used": "unknown (the code tries the first and falls back to the second; the choice was not recorded)"
+      },
+      "transformation": "Parsed into a monthly series from NOAA PSL's year-per-row grid.",
+      "attribution": "Created at NOAA PSL from HadISST1.1. HadISST data were obtained from https://www.metoffice.gov.uk/hadobs/hadisst/ and are (c) British Crown Copyright, Met Office, provided under an Open Government Licence. Cite Rayner et al. (2003), doi:10.1029/2002JD002670.",
+      "licence": {
+        "name": "HadISST: Open Government Licence (Met Office); the DMI file is produced by NOAA PSL",
+        "url": "https://www.metoffice.gov.uk/hadobs/hadisst/terms_and_conditions.html",
+        "note": "Terms read on 2026-10-22. The HadISST overview page also says the data are available 'for the purposes of private study and scientific research'; the two pages were not reconciled: see the Phase 9b report."
+      },
+      "file": "iod_series.parquet",
+      "restores_to": "backend/models/iod_series.parquet",
+      "sha256": "ee019796fbe01c0f1d4b689fdb9d8a71513e91f79d097faea42b95e90fffa1c4",
+      "size_bytes": 26655,
+      "fetch_date": "2026-08-18",
+      "fetch_date_basis": "UTC date of the modification time of the file in the folder it was copied from; the file is written when it is fetched, but this is not a date recorded by the fetch itself",
+      "rows": 1877,
+      "columns": [
+        "iod"
+      ],
+      "first": "1870-01-01",
+      "last": "2026-05-01"
+    }
+  ]
+}

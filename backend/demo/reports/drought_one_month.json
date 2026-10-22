@@ -1,0 +1,195 @@
+{
+  "request": "What is the drought risk for Rajasthan next month, and how much should I trust it?",
+  "report": "# Summary\n\nYou asked for the drought risk in Rajasthan next month. For January 2025, this project forecasts a normal rainfall pattern with a predicted Standardized Precipitation Index value of 0.35, and testing shows this first-month forecast is reliable. The forecast also covers February 2025 (predicted value 0.04) and March 2025 (predicted value -0.14), but forecast reliability drops significantly after the first month.\n\n# How to read this report\n\nEach monthly forecast produced by this system comes with a reliability label determined by testing the model against historical weather data. Some months are reliable, meaning the model performs noticeably better than simply assuming normal historical weather. Other months have weak skill or no skill at all. If a monthly figure is labelled as not reliable (\"no skill\"), it means the model performs no better than assuming standard seasonal conditions, and that figure should not be relied on or used for decision-making.\n\n# Drought\n\nThis assessment uses SPI-3 (Standardized Precipitation Index over a 3-month window), which measures whether total rainfall over three months is wetter or drier than normal for that time of year (source: NIH Roorkee — Standardized Precipitation Index methodology). Positive numbers indicate wetter conditions than usual, while negative numbers indicate drier conditions. \n\nAll figures below are generated from this project's model based on weather data archived through December 1, 2024 (which is 22 months behind today due to limits in the Open-Meteo weather archive). The model's overall test RMSE (root mean square error, a measure of average prediction error) is 0.8918, and the calculated overall risk score is 1.7.\n\nHere are the predictions for Rajasthan:\n\n- **January 2025 (Month 1):** Predicted SPI-3 is **0.35** with a risk flag of **Normal**. This project measured a test skill score of **0.2622**. \n  - *Reliability label:* `validated` — reliable — this project tested this forecast against past years and it does meaningfully better than just assuming normal conditions.\n- **February 2025 (Month 2):** Predicted SPI-3 is **0.04** with a risk flag of **Normal**. This project measured a test skill score of **0.0766**. \n  - *Reliability label:* `weak/directional` — weak — this project's testing found it only slightly better than assuming normal conditions, so treat it as a hint about direction, not a number to plan on.\n- **March 2025 (Month 3):** Predicted SPI-3 is **-0.14** with a risk flag of **Normal**. This project measured a test skill score of **-0.0145**. \n  - *Reliability label:* `no skill — shown for context only, do not rely on this figure` — not reliable — this project's own testing found this forecast is no better than simply assuming normal seasonal conditions, so do not act on this number.\n\n**Practical upshot:** Conditions in January 2025 are expected to be near normal, so no special drought precautions or emergency actions are required for next month.\n\n# What other organisations are reporting\n\nThe following observations and reports come directly from external organisations. None of these figures are calculated or predicted by this project:\n\n- **India Meteorological Department (IMD):**\n  - **IMD Extended Range Forecast:** IMD's press release from October 15, 2026 (covering October 15 to 28, 2026) reports that hailstorms occurred at isolated places over East Rajasthan on October 13, 2026, during the monsoon withdrawal phase. *Note:* This update covers October 2026, which does not match the January to March 2025 forecast timeframe requested.\n  - **IMD Seasonal Forecast:** IMD's seasonal forecast page was unavailable (reason given: fetched but contained 0 characters of usable text, indicating the page structure may have changed).\n- **NASA POWER:**\n  - NASA POWER reports aggregated weather data for Rajasthan (Jaipur location at 26.9°N, 75.8°E) for the month of September 2026. Monthly total rainfall was 109.61 mm, average temperature was 27.99 °C, relative humidity was 69.53 %, wind speed was 1.99 m/s, surface shortwave irradiance was 17.85 MJ/m²/day, and evapotranspiration energy flux was 2.31 MJ/m²/day. *Note:* This historical satellite observation covers September 2026, which does not align with the requested forecast window.\n- **data.gov.in:**\n  - data.gov.in daily mandi prices were unavailable (reason given: no data.gov.in API key is set).",
+  "grounding": {
+    "status": "clean",
+    "grounded": true,
+    "total_checked": 30,
+    "unverified_numbers": [],
+    "report_missing": false,
+    "explanation": "All 30 numeric claims in this report were traced to a tool output or a retrieved source."
+  },
+  "horizon_confidence": [
+    {
+      "horizon": "t+1",
+      "skill_score": 0.2622,
+      "method": "direct",
+      "label": "validated",
+      "reliable": true
+    },
+    {
+      "horizon": "t+2",
+      "skill_score": 0.0766,
+      "method": "direct",
+      "label": "weak/directional",
+      "reliable": false
+    },
+    {
+      "horizon": "t+3",
+      "skill_score": -0.0145,
+      "method": "direct",
+      "label": "no skill — shown for context only, do not rely on this figure",
+      "reliable": false
+    }
+  ],
+  "missing_data": [
+    {
+      "what": "reliable drought forecast at t+3",
+      "available": false,
+      "reason": "no skill — shown for context only, do not rely on this figure"
+    },
+    {
+      "what": "IMD outlook: IMD Seasonal Forecast page",
+      "available": false,
+      "reason": "fetched but only 0 chars of usable text — page structure may have changed"
+    }
+  ],
+  "tools_called": [
+    "forecast_drought_risk",
+    "retrieve_context",
+    "retrieve_context"
+  ],
+  "tool_outputs": {
+    "forecast_drought_risk": {
+      "region": "rajasthan",
+      "predicted_values": [
+        0.3528110980987549,
+        0.04203188419342041,
+        -0.14239390194416046
+      ],
+      "horizon_confidence": [
+        {
+          "horizon": "t+1",
+          "skill_score": 0.2622,
+          "method": "direct",
+          "label": "validated",
+          "month": "2025-01-01"
+        },
+        {
+          "horizon": "t+2",
+          "skill_score": 0.0766,
+          "method": "direct",
+          "label": "weak/directional",
+          "month": "2025-02-01"
+        },
+        {
+          "horizon": "t+3",
+          "skill_score": -0.0145,
+          "method": "direct",
+          "label": "no skill — shown for context only, do not rely on this figure",
+          "month": "2025-03-01"
+        }
+      ],
+      "risk_score": 1.7,
+      "risk_flags": [
+        "Normal",
+        "Normal",
+        "Normal"
+      ],
+      "model_rmse_test": 0.8918,
+      "forecast_anchor_month": "2024-12-01",
+      "forecast_months": [
+        "2025-01-01",
+        "2025-02-01",
+        "2025-03-01"
+      ],
+      "data_currency": {
+        "archive_through": "2024-12-01",
+        "weather_through": "2024-12-01",
+        "oni_through": "2026-06-01",
+        "data_current_through": "2024-12-01",
+        "months_behind_today": 22,
+        "limiting_input": "Open-Meteo weather archive",
+        "refresh_command": "python -m scripts.refresh"
+      }
+    }
+  },
+  "retrieved_sources": [
+    {
+      "source": "NIH Roorkee — Standardized Precipitation Index methodology",
+      "citation": "https://nihroorkee.gov.in/sites/default/files/uploadfiles/SPINov2011.pdf",
+      "section": "",
+      "score": 0.7498
+    },
+    {
+      "source": "NIH Roorkee — Standardized Precipitation Index methodology",
+      "citation": "https://nihroorkee.gov.in/sites/default/files/uploadfiles/SPINov2011.pdf",
+      "section": "",
+      "score": 0.7386
+    },
+    {
+      "source": "NIH Roorkee — Standardized Precipitation Index methodology",
+      "citation": "https://nihroorkee.gov.in/sites/default/files/uploadfiles/SPINov2011.pdf",
+      "section": "",
+      "score": 0.7278
+    },
+    {
+      "source": "Drought — model / region comparison",
+      "citation": "models/region_comparison.md",
+      "section": "Dedicated 1-month-ahead model",
+      "score": 0.7603
+    },
+    {
+      "source": "Drought — model / region comparison",
+      "citation": "models/region_comparison.md",
+      "section": "Final per-horizon verdict",
+      "score": 0.7583
+    },
+    {
+      "source": "Drought — model / region comparison",
+      "citation": "models/region_comparison.md",
+      "section": "Phase 1.5 — recursive vs. direct for t+2 and t+3",
+      "score": 0.7445
+    }
+  ],
+  "external_sources": [
+    {
+      "id": "nasa_power",
+      "title": "NASA POWER agrometeorology (daily, aggregated to the month)",
+      "publisher": "NASA Langley Research Center",
+      "citation": "NASA POWER (Prediction of Worldwide Energy Resources), https://power.larc.nasa.gov/",
+      "available": true,
+      "fetched_at": "2026-10-22T11:43:46+00:00",
+      "excerpt": "NASA POWER daily agrometeorology for Rajasthan (Jaipur centroid) (26.9, 75.8), 2026-09, aggregated over the month: all-sky surface shortwave irradiance: monthly mean 17.85 MJ/m^2/day (from 30 NASA POWER daily values); temperature at 2 m: monthly mean 27.99 C (from 30 NASA POWER daily values); corrected precipitation: monthly total 109.61 mm (from 30 NASA POWER daily values); evapotranspiration energy flux: monthly mean 2.31 MJ/m^2/day (from 30 NASA POWER daily values); relative humidity at 2 m: monthly mean 69.53 % (from 30 NASA POWER daily values); wind speed at 2 m: monthly mean 1.99 m/s (from 30 NASA POWER daily values). Evapotranspiration is reported by NASA POWER as an energy flux in MJ/m^2/day and is not converted here.",
+      "reason": null
+    },
+    {
+      "id": "data_gov_in_mandi",
+      "title": "data.gov.in daily mandi prices",
+      "publisher": "Ministry of Agriculture and Farmers Welfare (via data.gov.in)",
+      "citation": "data.gov.in, 'Current Daily Price of Various Commodities from Various Markets (Mandi)', Ministry of Agriculture and Farmers Welfare — https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070",
+      "available": false,
+      "fetched_at": "2026-10-22T11:43:46+00:00",
+      "excerpt": null,
+      "reason": "no data.gov.in API key is set — set DATA_GOV_IN_API_KEY (a free key comes from https://data.gov.in/apis). The rest of the report is unaffected."
+    }
+  ],
+  "warnings": [
+    "at least one IMD outlook was unavailable",
+    "data_gov_in_mandi unavailable: no data.gov.in API key is set — set DATA_GOV_IN_API_KEY (a free key comes from https://data.gov.in/apis). The rest of the report is unaffected."
+  ],
+  "quota": {},
+  "meta": {
+    "mode": "demo",
+    "saved_example": true,
+    "example_id": "drought_one_month",
+    "generated_at": "2026-10-22T11:44:19+00:00",
+    "how_made": "live_generation",
+    "report_generated": true,
+    "chat_model": "gemini-3.6-flash",
+    "embedding_model": "gemini-embedding-001",
+    "corpus": {
+      "manifest_generated_at": "2026-10-22T11:42:14+00:00",
+      "total_chunks": 101,
+      "embedding_model": "gemini-embedding-001",
+      "sha256_chunks": "45d35b79da9e1e06645d51f113a11bf65cbbd873ec6d090b7cb12276dc5873e8"
+    },
+    "data_current_through": {
+      "rajasthan": "2024-12-01"
+    },
+    "horizon_manifest_source": "generated",
+    "data_source": "snapshot",
+    "banner": "Saved example. Written by the live pipeline on the date in generated_at and saved as it was; asking again can give different text.",
+    "details": null
+  }
+}

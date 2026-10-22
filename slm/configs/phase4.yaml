@@ -1,0 +1,102 @@
+# Phase 4: DPO on top of the frozen SFT winner (0.5B). Fixed before any run; do not change after results exist.
+# Stage A (this file part): the preference pairs. Type 2 rule and type 3 loose filter and repeat 3: reviewer fixes. Stage B adds the DPO grid, the selection rule and the criteria.
+
+paths:
+  sft_train: data/instruction/sft_train.jsonl
+  sft_val: data/instruction/sft_val.jsonl          # only to check that no val id / chunk enters a pair
+  sft_test: data/instruction/sft_test.jsonl        # only to check that no test id / chunk enters a pair
+  base_train_eval: outputs/eval_base_train.json    # untuned 0.5B, greedy, default prompt, on the train split (cell P4-0)
+  pairs: data/instruction/dpo_train.jsonl
+  pairs_sha256: data/instruction/dpo_train.sha256
+  pairs_summary: data/instruction/dpo_train_summary.json
+  # Stage B outputs (kept apart from the Phase 3 files)
+  adapters_dir: outputs/adapters_dpo       # <run>/e1, e2, e3
+  runs_dir: outputs/runs_dpo               # <run>/train_log.json, reference_logps_seed<k>.json
+  mlruns_dir: outputs/mlruns               # same MLflow file store as Phase 3
+  selection_json: outputs/phase4_selection.json
+  selection_md: outputs/phase4_selection.md
+  selection_sha: outputs/phase4_selection.sha256   # written by select_dpo --freeze
+  final_md: outputs/phase4_final.md
+  test_log: outputs/phase4_test_runs.json
+  start_zip: outputs/phase4_start.zip
+
+pairs:
+  # Type 2 (reference vs a wrong untuned answer) was built, read by hand, found noisy and DROPPED (reviewer amendment
+  # 2026-10-20). The code stays; this flag keeps the choice visible. Default false.
+  include_type2: false
+  # type 2: the untuned output counts as rejected only if its token F1 against the reference is below this value
+  rejected_f1_below: 0.5
+  # ... AND (key_recall below this value OR an output number that the context does not support: number faithfulness < 1)
+  rejected_key_recall_below: 0.5
+  # fewer type 2 pairs than this: type 2 is removed completely (and the report says so)
+  type2_min_pairs: 20
+  # each type 3 pair is written this many times (ids <row>:t3:r1 ... :r3). Reviewer decision for Stage A fixes.
+  refusal_pair_repeat: 3
+  samples: {1: 5, 2: 10, 3: 10}   # pairs per type printed in full by --show
+  sample_seed: 42
+  f1_bins: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0001]
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Stage B: the DPO runs. Fixed before any run; nothing below is changed after results exist.
+# The LoRA settings (r 16, alpha 32, dropout 0.05, 7 target modules) are NOT repeated here: the policy is the SFT adapter
+# itself and keeps the settings stored in it (checked at the start of a run against configs/phase3.yaml).
+# ---------------------------------------------------------------------------------------------------------------------
+
+mlflow:
+  experiment_name: phase4_dpo          # same file store as Phase 3 (outputs/mlruns)
+
+model:
+  model_id: Qwen/Qwen2.5-0.5B-Instruct   # DPO is run on the 0.5B only (the tuned 1.5B has nothing to fix on test)
+
+# Start point (and the "no DPO" control) of each seed: the frozen SFT adapter of that seed, epoch 2.
+# sha256 = of adapter_model.safetensors, computed on the laptop copy on 2026-10-20 (no earlier hash was recorded);
+# the trainer refuses to start if the file on the Colab machine differs.
+start:
+  epoch: 2
+  seeds:
+    42: {run: lora_fp16_lr2e-4,     adapter: outputs/adapters/lora_fp16_lr2e-4/e2,
+         sha256: 3f2d8da3940be8e84e34538ecaf2ea58cdf0ca631c70570cb984e46dd54720f3, control: lora_fp16_lr2e-4_e2}
+    43: {run: lora_fp16_lr2e-4_s43, adapter: outputs/adapters/lora_fp16_lr2e-4_s43/e2,
+         sha256: 78c6ce89a5e2ebadad0a70529d13fd3662b5d9c8dbabbb93209053fccbf464d4, control: lora_fp16_lr2e-4_s43_e2}
+    44: {run: lora_fp16_lr2e-4_s44, adapter: outputs/adapters/lora_fp16_lr2e-4_s44/e2,
+         sha256: e4af5e2027d4d724206aa615d058c495a5374d7bcc0b84e7a9e5083888aae964, control: lora_fp16_lr2e-4_s44_e2}
+  # saved eval files (outputs/) that travel to Colab with the start adapters (phase4-start zip)
+  extra_eval_files: [eval_base_val.json]
+
+sweep:
+  betas: [0.1, 0.3]
+  learning_rates: [5.0e-5, 2.0e-4]   # only ~36 optimiser steps per run: 2e-5 would hardly move the LoRA weights
+  seed: 42
+  repeat_seeds: [43, 44]               # the winning configuration only; seed k starts from the SFT adapter of seed k
+
+train:
+  epochs: 3                            # one adapter is saved after EVERY epoch (12 candidates)
+  effective_batch_size: 16             # pairs (lines of dpo_train.jsonl) per optimiser step
+  micro_batch_size: 1                  # pairs per forward pass (2 sequences each); accumulation = 16. 2 needs more memory.
+  warmup_ratio: 0.1
+  lr_schedule: cosine
+  weight_decay: 0.0
+  max_grad_norm: 1.0
+  max_seq_len: 2048                    # prompt + answer tokens of each side; a pair that does not fit is dropped, never cut
+  skip_if_done: true
+  dtype: float16
+  grad_scaler_init_scale: 4096
+  reference_cache: true                # reference log-probs saved once per seed and reused by the runs of that seed
+
+# Selection rule, applied on VAL only (climate_slm/training/select_dpo.py)
+selection:
+  min_correct_refusals_val: 7          # step 1: strict correct refusals on val (of 11)
+  max_median_length_ratio: 1.5         # extra filter: median output length at most 1.5 x the SFT control
+  max_hit_max_new_tokens: 1            # extra filter: at most 1 output at max_new_tokens
+  round_decimals: 4
+  order:                               # steps 2 to 7
+    - false_refusals                   # lower is better
+    - correct_refusals_strict          # higher
+    - token_f1                         # higher
+    - number_faithfulness              # higher
+    - peak_gpu_mem                     # lower
+    - train_seconds                    # lower
+    - epoch                            # earlier
+  control_seed: 42                     # the SFT control whose false-refusal count must be improved on (3/42 on val)
+
+# The pass criteria 1 to 6 are the Phase 3 ones (configs/phase3.yaml `criteria`); criterion 7 is not applicable here.

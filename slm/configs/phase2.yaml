@@ -1,0 +1,210 @@
+# Phase 2 config: one evaluator for the base model, the QLoRA model and the DPO model.
+# The refusal text is NOT repeated here. It is read from configs/phase1.yaml (one copy).
+eval:
+  model_id: Qwen/Qwen2.5-0.5B-Instruct
+  model_revision: null          # null = latest on the hub; the real commit is written into the output file
+  dtype: float16                # T4 has no usable bf16
+  device: cuda
+
+  # decoding (greedy). repetition_penalty is set to 1.0 on purpose: the model's own
+  # generation_config.json may carry another value, and that would not be plain greedy decoding.
+  do_sample: false
+  max_new_tokens: 256
+  repetition_penalty: 1.0
+  padding_side: left
+  batch_size: 8
+  ppl_batch_size: 4             # perplexity pass (full prompt + completion, needs more memory)
+
+  # bootstrap confidence interval (percentile, over items)
+  n_boot: 2000
+  boot_seed: 42
+  ci_level: 0.95
+
+  # loose refusal detection: a phrase found anywhere in the normalised output. Can be wrong, see the review CSV.
+  loose_refusal_phrases:
+    - cannot answer
+    - can't answer
+    - can not answer
+    - unable to answer
+    - not provided in the context
+    - not mentioned in the context
+    - not stated in the context
+    - does not contain
+    - doesn't contain
+    - does not provide
+    - does not mention
+    - does not specify
+    - no information
+    - not enough information
+
+  # best_sentence baseline
+  best_sentence:
+    sentence_split_regex: '(?<=[.!?])\s+'
+    min_sentence_chars: 20
+    min_word_len: 3
+
+  # 10 fixed test ids for the qualitative file (6 answerable, 4 refusal). Picked by
+  # scripts/pick_qualitative_ids.py with the seed below, BEFORE any model output existed.
+  qualitative_seed: 42
+  qualitative_n_answerable: 6
+  qualitative_n_refusal: 4
+  qualitative_split: test
+  qualitative_ids:
+    - te2-0001
+    - te2-0013
+    - te2-0015
+    - te2-0036
+    - te2-0041
+    - te2-0047
+    - te2-0050
+    - te2-0052
+    - te2-0062
+    - te2-0063
+
+  # ---- Phase 2c ----
+  # Decoding modes. `greedy` = the top-level keys above, unchanged. `qwen_default` = the sampling values the
+  # Qwen model card / generation_config.json uses (taken from the Phase 2c brief, not re-checked on the hub).
+  # A sampling mode needs --seed.
+  decoding_modes:
+    greedy: {}
+    qwen_default: {do_sample: true, temperature: 0.7, top_p: 0.8, top_k: 20, repetition_penalty: 1.1}
+  decoding_seeds: [1, 2, 3]
+  decoding_run_suffix: qwen_s   # run name = <name>_qwen_s<seed>
+
+  # Prompt variants. `default` = the stored prompt of every item (no change). The others only change the
+  # system message (and add chat turns for fewshot); the context and the question stay the same.
+  # The perplexity pass uses the SAME variant prompt as generation.
+  prompt_variants:
+    default:
+      run_suffix: ""
+    strict_sentence:
+      run_suffix: p_sentence      # run name = <name>_p_sentence
+      system_suffix: >-
+        Answer in one complete sentence that is copied or closely taken from the context. If the context does not
+        contain the answer, reply with exactly this text and nothing else: {refusal_text}
+    fewshot:
+      run_suffix: p_fewshot       # run name = <name>_p_fewshot
+      extends: strict_sentence
+      fewshot_examples: true
+
+  # The two worked examples of the fewshot variant. TRAIN split only. Chosen by scripts/pick_fewshot_ids.py
+  # with the seed below; only items a person or the reviewer looked at and marked good (spot_check human or
+  # reviewer), with a short context, no blind-check flag, and a one-sentence reference answer.
+  fewshot:
+    split: train
+    seed: 42
+    max_context_chars: 1500
+    max_answer_chars: 250
+    require_spot_check: [human, reviewer]
+    order: [answerable, refusal]   # order of the two worked examples in the prompt
+    ids:
+      answerable: tr2-0130
+      refusal: tr2-0198
+
+paths:
+  splits:
+    train: data/instruction/sft_train.jsonl
+    val: data/instruction/sft_val.jsonl
+    test: data/instruction/sft_test.jsonl
+  outputs_dir: outputs
+  baseline_table: outputs/baseline_table.md
+  colab_bundle: outputs/colab_bundle.zip
+  refusal_review: docs/REFUSAL_REVIEW.txt
+
+report:
+  # rows that must always be in the table; a missing one is shown as "not yet measured"
+  expected_runs:
+    - {name: always_refuse, label: "always_refuse (no model)"}
+    - {name: best_sentence, label: "best_sentence (no model)"}
+    - {name: base, label: "base Qwen2.5-0.5B-Instruct"}
+    - {name: base_p_sentence, label: "base Qwen, strict_sentence prompt"}
+    - {name: base_p_fewshot, label: "base Qwen, fewshot prompt"}
+    - {name: base15, label: "base Qwen2.5-1.5B-Instruct (Phase 3 arm)"}
+  splits: [test, val]
+  not_measured_text: not yet measured
+  # decoding sensitivity section: runs named <group>_qwen_s<seed>. Never mixed into the main rows.
+  decoding_group: base
+  # Phase 3 sweep runs (tuned adapters) are shown in outputs/phase3_selection.md, not in this table
+  hide_run_patterns: ["lora_fp16_*", "qlora_4bit_*", "q15_*", "dpo_*", "dpo2_*", "svc_*"]
+  decoding_title: Decoding sensitivity (base only)
+  bare_max_chars: 40          # scripts/bare_answer_check.py: outputs shorter than this count as bare values
+  decimals: 3
+
+bundle:
+  # folders are taken whole (only the listed file endings); files are taken as they are
+  folders:
+    - {path: climate_slm, endings: [.py]}
+    - {path: configs, endings: [.yaml]}
+    - {path: serving, endings: [.py]}            # Phase 5 service
+  files:
+    - requirements-gpu.txt
+    - scripts/vllm_smoke.py                      # Phase 5 cell P5-0
+    - scripts/phase5_check.py                    # Phase 5 cells P5-1 .. P5-6
+    - scripts/parity_check.py
+    - scripts/bench_serving.py
+    - scripts/phase5_report.py
+    - data/instruction/sft_train.jsonl
+    - data/instruction/sft_val.jsonl
+    - data/instruction/sft_test.jsonl
+    - data/instruction/dpo_train.jsonl          # Phase 4 preference pairs and their sha256
+    - data/instruction/dpo_train.sha256
+    - data/instruction/dpo2_main.jsonl          # Phase 4b (DPO v2) pair sets and their sha256
+    - data/instruction/dpo2_main.sha256
+    - data/instruction/dpo2_mix.jsonl
+    - data/instruction/dpo2_mix.sha256
+
+# Files that belong to the Phase 2c Colab runs (zipped by climate_slm.evaluation.collect). The default base runs are not in it.
+collect:
+  patterns:
+    - "eval_*_p_*.json"
+    - "eval_*_qwen_s*.json"
+    - "refusal_detection_review_*_p_*.csv"
+    - "refusal_detection_review_*_qwen_s*.csv"
+  # Phase 3 (outputs/ relative). Results zip = these files + the folders below. Adapters go in their own zip.
+  phase3_patterns:
+    - "phase3_*.md"
+    - "phase3_*.json"
+    - "phase3_*.sha256"
+    - "eval_lora_fp16_*"
+    - "eval_qlora_4bit_*"
+    - "eval_q15_*"
+    - "eval_base15_*"
+    - "refusal_detection_review_lora_fp16_*"
+    - "refusal_detection_review_qlora_4bit_*"
+    - "refusal_detection_review_q15_*"
+    - "refusal_detection_review_base15_*"
+  phase3_dirs: [runs, mlruns]
+  phase3_adapter_dir: adapters
+  # Phase 4 (outputs/ relative). Results zip = these files + the folders below. DPO adapters go in their own zip.
+  # The start zip (SFT adapters + control val files, made on the laptop) is described in configs/phase4.yaml `start`.
+  phase4_patterns:
+    - "phase4_*.md"
+    - "phase4_*.json"
+    - "phase4_*.sha256"
+    - "eval_dpo_*"
+    - "refusal_detection_review_dpo_*"
+  phase4_dirs: [runs_dpo, mlruns]
+  phase4_adapter_dir: adapters_dpo
+  # Phase 4b (DPO v2), outputs/ relative; same shape as Phase 4
+  phase4b_patterns:
+    - "phase4b_*.md"
+    - "phase4b_*.json"
+    - "phase4b_*.sha256"
+    - "eval_dpo2_*"
+    - "refusal_detection_review_dpo2_*"
+  phase4b_dirs: [runs_dpo2, mlruns]
+  phase4b_adapter_dir: adapters_dpo2
+  # Phase 5 (serving), outputs/ relative: tables, raw results of the parity check and the benchmark (with the server logs), the
+  # evaluator-format files of the live service (svc_*), the MLflow store. The start zip is described in configs/phase5.yaml (models).
+  phase5_patterns:
+    - "phase5_*.md"
+    - "phase5_*.json"
+    - "phase5_*.csv"
+    - "eval_svc_*"
+    - "refusal_detection_review_svc_*"
+  phase5_dirs: [phase5, mlruns]
+
+# Refusal review sheet for the owner (scripts/make_refusal_review.py). Context only, no model output.
+refusal_review:
+  seed: 42
+  splits: [test, val]

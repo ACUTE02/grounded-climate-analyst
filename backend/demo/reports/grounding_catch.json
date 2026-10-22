@@ -1,0 +1,136 @@
+{
+  "request": "What is the one-month drought forecast for Rajasthan?",
+  "report": "> **UNVERIFIED FIGURES WARNING.** The following numbers in this report could not be traced to a tool output or a retrieved source: 0.42. They may be fabricated or misquoted. Every other figure was verified mechanically against source data. Do not rely on the flagged values.\n\nThe 1-month drought forecast achieves a skill score of 0.42, well above the project threshold. Predicted SPI-3 is -1.62.",
+  "grounding": {
+    "status": "warning",
+    "grounded": false,
+    "total_checked": 3,
+    "unverified_numbers": [
+      "0.42"
+    ],
+    "report_missing": false,
+    "explanation": "1 of 3 numeric claims could not be traced to any source: 0.42. They may be fabricated or misquoted. Do not rely on the flagged values."
+  },
+  "horizon_confidence": [
+    {
+      "horizon": "t+1",
+      "skill_score": 0.2622,
+      "method": "direct",
+      "label": "validated",
+      "reliable": true
+    },
+    {
+      "horizon": "t+2",
+      "skill_score": 0.0766,
+      "method": "direct",
+      "label": "weak/directional",
+      "reliable": false
+    },
+    {
+      "horizon": "t+3",
+      "skill_score": -0.0145,
+      "method": "direct",
+      "label": "no skill — shown for context only, do not rely on this figure",
+      "reliable": false
+    }
+  ],
+  "missing_data": [
+    {
+      "what": "reliable drought forecast at t+3",
+      "available": false,
+      "reason": "no skill — shown for context only, do not rely on this figure"
+    }
+  ],
+  "tools_called": [],
+  "tool_outputs": {
+    "forecast_drought_risk": {
+      "region": "rajasthan",
+      "predicted_values": [
+        -1.62,
+        -0.41,
+        0.08
+      ],
+      "horizon_confidence": [
+        {
+          "horizon": "t+1",
+          "skill_score": 0.2622,
+          "method": "direct",
+          "label": "validated"
+        },
+        {
+          "horizon": "t+2",
+          "skill_score": 0.0766,
+          "method": "direct",
+          "label": "weak/directional"
+        },
+        {
+          "horizon": "t+3",
+          "skill_score": -0.0145,
+          "method": "direct",
+          "label": "no skill — shown for context only, do not rely on this figure"
+        }
+      ],
+      "risk_score": 8.5,
+      "risk_flags": [
+        "Severe",
+        "Normal",
+        "Normal"
+      ],
+      "model_rmse_test": 0.8918
+    }
+  },
+  "retrieved_sources": [],
+  "external_sources": [],
+  "warnings": [],
+  "quota": {},
+  "meta": {
+    "mode": "demo",
+    "saved_example": true,
+    "example_id": "grounding_catch",
+    "generated_at": "2026-10-22T12:03:03+00:00",
+    "how_made": "constructed_fixture",
+    "report_generated": true,
+    "chat_model": null,
+    "embedding_model": null,
+    "corpus": null,
+    "data_current_through": null,
+    "horizon_manifest_source": null,
+    "data_source": null,
+    "banner": "Saved example. The report below was made wrong on purpose to show the number checker; a real recorded case is described in details.",
+    "details": {
+      "fixture_case": "fabricated_skill_score",
+      "fixture_why": "The commonest fabrication shape: a plausible but invented metric.",
+      "invented_numbers": [
+        "0.42"
+      ],
+      "fixture_note": "The report text and the tool output in this example are a labelled test case from evaluation/checker_eval.py, not a real forecast: the report was written wrong on purpose. The warning above it, the flagged number and the counts are the real checker's output for that text.",
+      "related_real_case": {
+        "source_file": "orchestrator/grounding_caught_sample.json",
+        "what_happened": "During Phase 3 testing the grounding checker caught a genuine fabrication. Asked for a 4-month drought forecast (which does not exist), Gemini correctly declined the forecast but then explained SPI by reciting the standard McKee classification bands — 'SPI values between -0.99 and 0.99 are near normal, -1.0 to -1.49 moderately dry' — and cited them to the NIH Roorkee SPI methodology document.",
+        "why_it_matters": "Those numbers appear NOWHERE in the corpus: not in the retrieved chunks, not in any indexed document. They came from the model's own training data and were attributed to a real source that does not contain them. They are also *correct in the real world*, which makes this the most dangerous class of error — plausible, well-formed, verifiable-looking, and untraceable. A careful human reader would likely have accepted it.",
+        "how_the_pipeline_behaved": "Attempt 1 flagged -0.99 and -1.49; the retry prompt listed them and asked for removal; attempt 2 dropped -0.99 but kept -1.49. Having exhausted MAX_SYNTHESIS_ATTEMPTS, the graph attached the unverified-figures warning banner rather than returning a clean-looking report, and logged both attempts.",
+        "fix_applied": "Added an explicit prompt rule forbidding recited threshold tables, classification bands and numeric definitions unless those exact numbers appear in the provided sources — the failure was a category the prompt had not anticipated: not inventing a *result*, but reciting textbook reference values.",
+        "request": "Give me the 4-month ahead drought forecast for Rajasthan with exact SPI values, and the drought risk for Jaisalmer.",
+        "attempts": [
+          {
+            "attempt": 1,
+            "logged_at": "2026-08-18T16:54:53+00:00",
+            "unverified_numbers": [
+              "-0.99",
+              "-1.49"
+            ],
+            "total_checked": 23
+          },
+          {
+            "attempt": 2,
+            "logged_at": "2026-08-18T16:55:37+00:00",
+            "unverified_numbers": [
+              "-1.49"
+            ],
+            "total_checked": 21
+          }
+        ]
+      }
+    }
+  }
+}

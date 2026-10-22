@@ -1,0 +1,178 @@
+{
+  "request": "What is the drought risk for Barmer over the next three months, and how much should I trust each month's number?",
+  "report": "> **UNVERIFIED FIGURES WARNING.** The following numbers in this report could not be traced to a tool output or a retrieved source: 97. They may be fabricated or misquoted. Every other figure was verified mechanically against source data. Do not rely on the flagged values.\n\n## Summary\n\nThis report assesses the drought risk for Barmer over the three-month period covering January 2025, February 2025, and March 2025. This project predicts near-normal conditions for all three months, with predicted SPI-3 values of 0.21 for January 2025, 0.20 for February 2025, and 0.07 for March 2025, leading to an overall drought risk score of 1.4. However, you should only rely on the January 2025 forecast: this project's testing shows the January figure is reliable, the February figure is weak, and the March figure has no measured skill and should not be used for planning.\n\n## How to read this report\n\nEach monthly figure in this report comes with a reliability label based on how well this project's model predicted real conditions in past years. Some forecast months have proven reliable against historical data, while others perform no better than simply assuming normal seasonal weather. Any month labeled as having no skill is included only for completeness, and you should not act on or plan around that figure.\n\n## Drought\n\nSPI-3 (Standardized Precipitation Index over a 3-month window) is a standard measure of whether total rainfall over the past three months was wetter or drier than the long-term normal for that time of year. Positive values indicate wetter conditions, while negative values indicate drier conditions.\n\nThis forecast is anchored in December 2024 (2024-12-01) using weather data current through December 2024 (22 months behind today). The model's overall test root mean square error (RMSE) is 1.0986, and the overall drought risk score is 1.4, with all three months carrying a \"Normal\" risk flag.\n\nHere is the month-by-month breakdown and how much trust to place in each figure:\n\n* **January 2025**: Predicted SPI-3 value of **0.21**. Measured skill score is **0.2053** with the label `validated` — reliable — this project tested this forecast against past years and it does meaningfully better than just assuming normal conditions.\n* **February 2025**: Predicted SPI-3 value of **0.20**. Measured skill score is **0.0438** with the label `weak/directional` — weak — this project's testing found it only slightly better than assuming normal conditions, so treat it as a hint about direction, not a number to plan on.\n* **March 2025**: Predicted SPI-3 value of **0.07**. Measured skill score is **-0.0489** with the label `no skill — shown for context only, do not rely on this figure` — not reliable — this project's own testing found this forecast is no better than simply assuming normal seasonal conditions, so do not act on this number.\n\n**Practical upshot**: You can plan around normal moisture conditions continuing through January 2025, but you should not make financial or planting decisions based on the February or March forecasts.\n\n## What other organisations are reporting\n\n* **IMD Extended Range Forecast**: IMD's extended-range press release dated 15 October 2026 (covering 15 to 28 October 2026) reports that the Southwest Monsoon had withdrawn from most of the country by mid-October 2026, and notes isolated hailstorms in East Rajasthan on 13 October 2026 *(source: IMD Extended Range Forecast)*. This provides short-term context for late 2026 rather than early 2025.\n* **IMD Seasonal Forecast**: IMD's seasonal forecast page was unavailable (reason: fetched but only 97 chars of usable text).\n* **NASA POWER**: NASA POWER agrometeorology reports observed monthly conditions for Barmer (25.75, 71.38) for September 2026: monthly corrected precipitation total of 12.38 mm, monthly mean 2 m temperature of 31.5 C, monthly mean relative humidity of 50.68 %, monthly mean wind speed at 2 m of 2.77 m/s, monthly mean surface shortwave irradiance of 20.34 MJ/m^2/day, and monthly mean evapotranspiration energy flux of 1.1 MJ/m^2/day *(source: NASA POWER agrometeorology)*.\n* **data.gov.in**: Mandi price data from data.gov.in was unavailable because no data.gov.in API key is set.",
+  "grounding": {
+    "status": "warning",
+    "grounded": false,
+    "total_checked": 31,
+    "unverified_numbers": [
+      "97"
+    ],
+    "report_missing": false,
+    "explanation": "1 of 31 numeric claims could not be traced to any source: 97. They may be fabricated or misquoted. Do not rely on the flagged values."
+  },
+  "horizon_confidence": [
+    {
+      "horizon": "t+1",
+      "skill_score": 0.2053,
+      "method": "direct",
+      "label": "validated",
+      "reliable": true
+    },
+    {
+      "horizon": "t+2",
+      "skill_score": 0.0438,
+      "method": "direct",
+      "label": "weak/directional",
+      "reliable": false
+    },
+    {
+      "horizon": "t+3",
+      "skill_score": -0.0489,
+      "method": "direct",
+      "label": "no skill — shown for context only, do not rely on this figure",
+      "reliable": false
+    }
+  ],
+  "missing_data": [
+    {
+      "what": "reliable drought forecast at t+3",
+      "available": false,
+      "reason": "no skill — shown for context only, do not rely on this figure"
+    },
+    {
+      "what": "IMD outlook: IMD Seasonal Forecast page",
+      "available": false,
+      "reason": "fetched but only 97 chars of usable text — page structure may have changed"
+    }
+  ],
+  "tools_called": [
+    "forecast_drought_risk",
+    "retrieve_context"
+  ],
+  "tool_outputs": {
+    "forecast_drought_risk": {
+      "region": "barmer",
+      "predicted_values": [
+        0.20994198322296143,
+        0.2027573585510254,
+        0.06797705590724945
+      ],
+      "horizon_confidence": [
+        {
+          "horizon": "t+1",
+          "skill_score": 0.2053,
+          "method": "direct",
+          "label": "validated",
+          "month": "2025-01-01"
+        },
+        {
+          "horizon": "t+2",
+          "skill_score": 0.0438,
+          "method": "direct",
+          "label": "weak/directional",
+          "month": "2025-02-01"
+        },
+        {
+          "horizon": "t+3",
+          "skill_score": -0.0489,
+          "method": "direct",
+          "label": "no skill — shown for context only, do not rely on this figure",
+          "month": "2025-03-01"
+        }
+      ],
+      "risk_score": 1.4,
+      "risk_flags": [
+        "Normal",
+        "Normal",
+        "Normal"
+      ],
+      "model_rmse_test": 1.0986,
+      "forecast_anchor_month": "2024-12-01",
+      "forecast_months": [
+        "2025-01-01",
+        "2025-02-01",
+        "2025-03-01"
+      ],
+      "data_currency": {
+        "archive_through": "2024-12-01",
+        "weather_through": "2024-12-01",
+        "oni_through": "2026-06-01",
+        "data_current_through": "2024-12-01",
+        "months_behind_today": 22,
+        "limiting_input": "Open-Meteo weather archive",
+        "refresh_command": "python -m scripts.refresh"
+      }
+    }
+  },
+  "retrieved_sources": [
+    {
+      "source": "Heat Stress — model / region comparison",
+      "citation": "models/heat_region_comparison.md",
+      "section": "Skill by horizon — vs climatology and vs persistence",
+      "score": 0.7853
+    },
+    {
+      "source": "Drought — model / region comparison",
+      "citation": "models/region_comparison.md",
+      "section": "Final per-horizon verdict",
+      "score": 0.7797
+    },
+    {
+      "source": "Drought — model / region comparison",
+      "citation": "models/region_comparison.md",
+      "section": "Dedicated 1-month-ahead model",
+      "score": 0.7687
+    }
+  ],
+  "external_sources": [
+    {
+      "id": "nasa_power",
+      "title": "NASA POWER agrometeorology (daily, aggregated to the month)",
+      "publisher": "NASA Langley Research Center",
+      "citation": "NASA POWER (Prediction of Worldwide Energy Resources), https://power.larc.nasa.gov/",
+      "available": true,
+      "fetched_at": "2026-10-22T11:45:26+00:00",
+      "excerpt": "NASA POWER daily agrometeorology for Barmer (Thar Desert) (25.75, 71.38), 2026-09, aggregated over the month: all-sky surface shortwave irradiance: monthly mean 20.34 MJ/m^2/day (from 30 NASA POWER daily values); temperature at 2 m: monthly mean 31.5 C (from 30 NASA POWER daily values); corrected precipitation: monthly total 12.38 mm (from 30 NASA POWER daily values); evapotranspiration energy flux: monthly mean 1.1 MJ/m^2/day (from 30 NASA POWER daily values); relative humidity at 2 m: monthly mean 50.68 % (from 30 NASA POWER daily values); wind speed at 2 m: monthly mean 2.77 m/s (from 30 NASA POWER daily values). Evapotranspiration is reported by NASA POWER as an energy flux in MJ/m^2/day and is not converted here.",
+      "reason": null
+    },
+    {
+      "id": "data_gov_in_mandi",
+      "title": "data.gov.in daily mandi prices",
+      "publisher": "Ministry of Agriculture and Farmers Welfare (via data.gov.in)",
+      "citation": "data.gov.in, 'Current Daily Price of Various Commodities from Various Markets (Mandi)', Ministry of Agriculture and Farmers Welfare — https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070",
+      "available": false,
+      "fetched_at": "2026-10-22T11:45:26+00:00",
+      "excerpt": null,
+      "reason": "no data.gov.in API key is set — set DATA_GOV_IN_API_KEY (a free key comes from https://data.gov.in/apis). The rest of the report is unaffected."
+    }
+  ],
+  "warnings": [
+    "at least one IMD outlook was unavailable",
+    "data_gov_in_mandi unavailable: no data.gov.in API key is set — set DATA_GOV_IN_API_KEY (a free key comes from https://data.gov.in/apis). The rest of the report is unaffected."
+  ],
+  "quota": {},
+  "meta": {
+    "mode": "demo",
+    "saved_example": true,
+    "example_id": "drought_no_skill_horizon",
+    "generated_at": "2026-10-22T11:46:52+00:00",
+    "how_made": "live_generation",
+    "report_generated": true,
+    "chat_model": "gemini-3.6-flash",
+    "embedding_model": "gemini-embedding-001",
+    "corpus": {
+      "manifest_generated_at": "2026-10-22T11:42:14+00:00",
+      "total_chunks": 101,
+      "embedding_model": "gemini-embedding-001",
+      "sha256_chunks": "45d35b79da9e1e06645d51f113a11bf65cbbd873ec6d090b7cb12276dc5873e8"
+    },
+    "data_current_through": {
+      "barmer": "2024-12-01"
+    },
+    "horizon_manifest_source": "generated",
+    "data_source": "snapshot",
+    "banner": "Saved example. Written by the live pipeline on the date in generated_at and saved as it was; asking again can give different text.",
+    "details": null
+  }
+}

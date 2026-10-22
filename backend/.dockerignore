@@ -1,0 +1,18 @@
+.venv/
+.venv-*/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+.env.*
+
+# regenerable or local data: never in the image
+data/
+models/generated/
+models/generated_*/
+models/*.joblib
+models/*.parquet
+retrieval/chunks.jsonl
+retrieval/cache/
+retrieval/chroma_store/
+orchestrator/grounding_failures.jsonl

@@ -1,0 +1,226 @@
+{
+  "published_file": "backend/models/horizon_manifest.json",
+  "reproduced_file": "backend/models/generated/horizon_manifest.json",
+  "regions": {
+    "rajasthan": [
+      {
+        "horizon": "t+1",
+        "method": "direct",
+        "label": "validated",
+        "lookback": {
+          "value": 12,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.rajasthan[0].lookback",
+          "read_on": "2026-10-22"
+        },
+        "published_skill": {
+          "value": 0.2622,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.rajasthan[0].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "published_rmse": {
+          "value": 0.8918,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.rajasthan[0].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_skill": {
+          "value": 0.2622,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.rajasthan[0].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_rmse": {
+          "value": 0.8918,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.rajasthan[0].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "identical_to_published": true
+      },
+      {
+        "horizon": "t+2",
+        "method": "direct",
+        "label": "weak/directional",
+        "lookback": {
+          "value": 12,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.rajasthan[1].lookback",
+          "read_on": "2026-10-22"
+        },
+        "published_skill": {
+          "value": 0.0766,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.rajasthan[1].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "published_rmse": {
+          "value": 1.0132,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.rajasthan[1].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_skill": {
+          "value": 0.0766,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.rajasthan[1].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_rmse": {
+          "value": 1.0132,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.rajasthan[1].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "identical_to_published": true
+      },
+      {
+        "horizon": "t+3",
+        "method": "direct",
+        "label": "no skill — shown for context only, do not rely on this figure",
+        "lookback": {
+          "value": 24,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.rajasthan[2].lookback",
+          "read_on": "2026-10-22"
+        },
+        "published_skill": {
+          "value": -0.0145,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.rajasthan[2].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "published_rmse": {
+          "value": 1.096,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.rajasthan[2].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_skill": {
+          "value": -0.0145,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.rajasthan[2].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_rmse": {
+          "value": 1.096,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.rajasthan[2].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "identical_to_published": true
+      }
+    ],
+    "barmer": [
+      {
+        "horizon": "t+1",
+        "method": "direct",
+        "label": "validated",
+        "lookback": {
+          "value": 12,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.barmer[0].lookback",
+          "read_on": "2026-10-22"
+        },
+        "published_skill": {
+          "value": 0.2053,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.barmer[0].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "published_rmse": {
+          "value": 1.0986,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.barmer[0].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_skill": {
+          "value": 0.2053,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.barmer[0].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_rmse": {
+          "value": 1.0986,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.barmer[0].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "identical_to_published": true
+      },
+      {
+        "horizon": "t+2",
+        "method": "direct",
+        "label": "weak/directional",
+        "lookback": {
+          "value": 12,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.barmer[1].lookback",
+          "read_on": "2026-10-22"
+        },
+        "published_skill": {
+          "value": 0.0438,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.barmer[1].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "published_rmse": {
+          "value": 1.2857,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.barmer[1].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_skill": {
+          "value": 0.0438,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.barmer[1].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_rmse": {
+          "value": 1.2857,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.barmer[1].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "identical_to_published": true
+      },
+      {
+        "horizon": "t+3",
+        "method": "direct",
+        "label": "no skill — shown for context only, do not rely on this figure",
+        "lookback": {
+          "value": 12,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.barmer[2].lookback",
+          "read_on": "2026-10-22"
+        },
+        "published_skill": {
+          "value": -0.0489,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.barmer[2].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "published_rmse": {
+          "value": 1.4107,
+          "source_file": "backend/models/horizon_manifest.json",
+          "pointer": "regions.barmer[2].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_skill": {
+          "value": -0.0489,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.barmer[2].skill_score",
+          "read_on": "2026-10-22"
+        },
+        "reproduced_rmse": {
+          "value": 1.4107,
+          "source_file": "backend/models/generated/horizon_manifest.json",
+          "pointer": "regions.barmer[2].rmse_window_a",
+          "read_on": "2026-10-22"
+        },
+        "identical_to_published": true
+      }
+    ]
+  }
+}

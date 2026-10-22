@@ -1,0 +1,212 @@
+# Phase 1 config. Every threshold, path, prompt and size lives here.
+paths:
+  raw_chunks: data/raw/chunks_snapshot.jsonl
+  processed_dir: data/processed
+  instruction_dir: data/instruction
+  chunks_clean: data/processed/chunks_clean.jsonl
+  chunk_splits: data/processed/chunk_splits.json
+  prep_report: data/processed/prep_report.json
+  worklist: data/instruction/draft_worklist.json
+  drafts_train: data/instruction/drafts_train.jsonl
+  drafts_test: data/instruction/drafts_test.jsonl
+  candidates: data/instruction/candidates.jsonl
+  test_candidates: data/instruction/test_candidates.jsonl
+  verify_dir: data/instruction/verifier
+  review_log: data/instruction/review_log.csv
+  spot_check_train: data/instruction/spot_check_train.csv
+  spot_check_key: data/instruction/spot_check_key.csv
+  cross_split_overlap: data/processed/cross_split_overlap.json
+  refusal_plan_train: data/instruction/refusal_plan_train.json
+  refusal_plan_test: data/instruction/refusal_plan_test.json
+  verdict_history: data/instruction/verdict_history_stageA.jsonl
+  spot_check_test: data/instruction/spot_check_test.csv
+  stage_a_summary: data/instruction/stage_a_summary.json
+
+data:
+  source_type_keep: domain_reference
+  expected_total_chunks: 224
+  expected_kept_chunks: 181
+
+cleaning:
+  # lines that are only a page header such as "1 | P a g e"
+  page_header_regex: '^\s*\d+\s*\|\s*P\s*a\s*g\s*e\s*$'
+  hyphen_join_regex: '([A-Za-z])-\n([a-z])'
+  unicode_space_regex: '[  -   　]'
+  overlap_chars: 200
+  # skip chunks whose cleaned text is shorter than this
+  min_chunk_chars: 200
+
+split:
+  train: 0.70
+  val: 0.15
+  test: 0.15
+  block_size: 4
+  buffer_chunks: 1
+  seed: 42
+
+generator:
+  backend: llm_drafted        # how the drafts were made: llm_drafted (an LLM wrote them) or manual
+  questions_per_chunk: 2
+  test_target_items: 45
+  per_source_cap: 90          # size of the drafting worklist per source (questions), not the final cap
+  cap_seed: 42
+  # optional extra draft round; the Stage A round used 22 chunks for ndma_drought_guidelines
+  extension_chunks_per_source: {}
+  # final cap on answerable items in train+val per source (A2 fix F3); other sources are uncapped
+  answerable_cap_per_source:
+    ndma_drought_guidelines: 70
+  cap_seed_final: 42
+  test_min_refusals: 10
+  test_max_refusals: 12
+  test_refusal_ratio: 0.25
+  test_refusal_oversample: 1.5
+
+system_prompt: >-
+  You are a climate-risk assistant. Answer the question using only the given
+  context. If the context does not contain the answer, reply exactly: {refusal_text}
+
+refusal_text: "I cannot answer this from the provided context."
+
+unanswerable:
+  ratio: 0.15                 # A2: was 0.12
+  seed: 42
+  mix:                        # A2: replaces the single strategy `lexical_hard`
+    near_miss: 0.40           # same chunk, asks for a detail the chunk does not state
+    same_topic_missing: 0.40  # similar chunk (top-k by BM25), verifier says it cannot answer
+    random_other_source: 0.20
+  partner_pool_k: 5
+  max_partner_reuse: 2
+  same_topic_oversample: 1.5  # questions sent to the partner verifier per refusal wanted
+
+boilerplate:                  # heuristic, on top of the chunks in the skip logs
+  dotted_leader_regex: '\.{5,}'
+  head_chars: 300
+  head_phrases:
+    - skip to main content
+    - list of abbreviations
+    - table of contents
+    - contents
+    - foreword
+    - preface
+    - acknowledg
+    - annexure
+    - isbn
+    - list of tables
+  short_line_max_chars: 30
+  short_line_min_lines: 12
+  short_line_ratio: 0.65
+  head_phrase_max_chars: 1500
+  head_phrase_min_short_ratio: 0.30
+  name_list_regex: '\b(Shri|Dr\.|Prof\.|Smt\.)'
+  name_list_min_hits: 5
+  digit_ratio_max: 0.22
+  min_words: 40
+  legacy_font_regex: '[ÑÅÖ¼½ñÙÚÃ]'
+  legacy_font_min_hits: 5
+
+leakage:
+  question_jaccard_max: 0.60
+  answer_ngram_n: 8
+  overlap_report_top: 30
+
+checks:
+  min_support_overlap: 0.80   # share of answer content words found in chunk
+  min_word_len: 3
+  answer_min_chars: 8
+  answer_max_chars: 700
+  question_min_chars: 15
+  question_max_chars: 250
+  banned_question_phrases:
+    - "according to the passage"
+    - "according to the context"
+    - "according to the text"
+    - "in the passage"
+    - "in the context"
+    - "in the text"
+    - "the given context"
+    - "the above"
+    - "this passage"
+    - "this document"
+    - "this section"
+    - "the passage"
+  near_dup_jaccard: 0.85
+
+verification:
+  shards_train: 4
+  evidence_min_chars: 15
+  evidence_max_quotes: 3
+  evidence_min_coverage: 0.70   # share of answer content words that must appear in the quotes
+  fuzzy_match_min: 0.95         # share of quote words found in order in the chunk
+  fuzzy_span_factor: 1.5        # matched words must sit inside a window of factor * quote length + 5
+
+spot_check:
+  seed: 42
+  spot_check_train_n: 30
+  spot_min_refusal: 8
+  spot_min_ai_fixed_or_failed: 5
+  spot_check_test_n: 12
+  spot_min_refusal_test: 5
+  spot_check_max_disagreement: 0.20
+
+# ---- A3 (runs while the owner does the spot-check) ----
+a3:
+  reviewer_drop_reason: >-
+    reviewer judged the refusal ambiguous: the partner chunk gives part of the answer
+  reviewer_drop_ids:
+    - tr2-0216
+    - tr2-0214
+  val_min_items: 50
+  val_min_refusals: 8
+  cap_applies_to_val: false
+  val_new_refusals_near_miss: 5
+  val_new_refusals_same_topic: 3
+  val_new_refusals_random: 1
+  val_same_topic_oversample: 1        # extra same-topic questions sent to the partner verifier
+  blind_f1_min: 0.50
+  blind_shards: 6
+  blind_report: data/instruction/blind_check_report.csv
+  spot_check_hashes: data/instruction/spot_check_hashes.json
+  id_manifest: data/instruction/a3_id_manifest.json
+  val_extra_dir: data/instruction/val_extra
+
+# ---- Stage B (finalise after the owner spot-check) ----
+stage_b:
+  owner_good: good
+  owner_bad: bad
+  # a note that starts with this text means the reviewer decided the row, not the owner
+  reviewer_note_prefix: REVIEWER-DECIDED
+  # disagreement = (owner bad and AI OK) or (owner good and AI not OK). The threshold is
+  # spot_check.spot_check_max_disagreement; a rate above it means stop.
+  ai_ok_verdicts: [pass, fix]
+  owner_drop_label: owner_spot_check
+  # stays false unless the reviewer says in writing that the stop rule may be passed.
+  # Set to true by reviewer decision in docs/PHASE_1_StageB2.md (Option B).
+  allow_finalize_after_stop: true
+  override_source: docs/PHASE_1_StageB2.md
+  override_reason: >-
+    Reviewer decision, Option B. The reviewer read the chunks of the disputed rows. The owner cannot do a
+    second pass now (health), and his raw verdicts on refusal rows were unclear (13 of 14 refusal rows were
+    bad, and several notes say "can't answer", which means the refusal is right). In the reviewer's reading
+    the AI was right on the 5 disputed pool rows. This reading is from the same model family as the writer
+    and verifier, so it is not independent proof. Every item the owner marked bad is still dropped and none
+    is re-added (the conservative choice).
+  # the reviewer's reading of the 8 disagreeing rows. No verdict in the CSVs is changed by this.
+  reviewer_adjudication:
+    tr2-0197: Chunk has no budget amount. Refusal is correct. AI was right.
+    tr2-0194: Chunk has no count of KVKs. Refusal is correct. AI was right.
+    tr2-0217: Chunk is about agro-advisory services, nothing on monitoring frequency. Refusal is correct. AI was right.
+    te2-0054: >-
+      Chunk says DMIS is revamped with support of State DMCs and names DAC as the action agency, but says
+      nothing about who funds it. Refusal is correct. AI was right, but this is a near-miss that a model
+      could answer wrongly.
+    te2-0006: Answer is word for word in the chunk. Item is correct. Owner bad looks like a slip. AI was right.
+    tr2-0214: Ambiguous (chunk gives part of the answer). Already dropped by reviewer override. Nothing changes.
+    tr2-0012: AI failed it because the chunk starts mid-table, owner said good. Outside the pool anyway. Nothing changes.
+    tr2-0158: AI failed it because the chunk starts mid-sentence, owner said good. Outside the pool anyway. Nothing changes.
+  length_percentile: 95
+  frozen_columns: [id, split, source_id, chunk_text, question, answer, evidence_quote]
+  hashes_before_key: before_owner_fill
+  sft_train: data/instruction/sft_train.jsonl
+  sft_val: data/instruction/sft_val.jsonl
+  sft_test: data/instruction/sft_test.jsonl
+  summary: data/instruction/stage_b_summary.json

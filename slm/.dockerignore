@@ -1,0 +1,12 @@
+.venv-serve/
+.venv-*/
+__pycache__/
+*.pyc
+.env
+.env.*
+outputs/
+mlruns/
+data/
+tests/
+scripts/
+notebooks/

@@ -1,0 +1,67 @@
+{
+  "file": "backend/evaluation/checker_eval_results.json",
+  "generated_at": "2026-08-18T22:02:23+00:00",
+  "what_this_measures": "Precision and recall of orchestrator/grounding.py's check_grounding() on a hand-labelled adversarial set. Positive class = a number that is fabricated and should be flagged. Fully offline and deterministic — no LLM involved in either the checker or this score.",
+  "cases": {
+    "value": 14,
+    "source_file": "backend/evaluation/checker_eval_results.json",
+    "pointer": "cases",
+    "read_on": "2026-10-22"
+  },
+  "numbers_labelled": {
+    "value": 40,
+    "source_file": "backend/evaluation/checker_eval_results.json",
+    "pointer": "numbers_labelled",
+    "read_on": "2026-10-22"
+  },
+  "true_positives": {
+    "value": 13,
+    "source_file": "backend/evaluation/checker_eval_results.json",
+    "pointer": "true_positives",
+    "read_on": "2026-10-22"
+  },
+  "false_positives": {
+    "value": 0,
+    "source_file": "backend/evaluation/checker_eval_results.json",
+    "pointer": "false_positives",
+    "read_on": "2026-10-22"
+  },
+  "false_negatives": {
+    "value": 1,
+    "source_file": "backend/evaluation/checker_eval_results.json",
+    "pointer": "false_negatives",
+    "read_on": "2026-10-22"
+  },
+  "true_negatives": {
+    "value": 26,
+    "source_file": "backend/evaluation/checker_eval_results.json",
+    "pointer": "true_negatives",
+    "read_on": "2026-10-22"
+  },
+  "precision": {
+    "value": 1,
+    "source_file": "backend/evaluation/checker_eval_results.json",
+    "pointer": "precision",
+    "read_on": "2026-10-22"
+  },
+  "recall": {
+    "value": 0.9286,
+    "source_file": "backend/evaluation/checker_eval_results.json",
+    "pointer": "recall",
+    "read_on": "2026-10-22"
+  },
+  "f1": {
+    "value": 0.963,
+    "source_file": "backend/evaluation/checker_eval_results.json",
+    "pointer": "f1",
+    "read_on": "2026-10-22"
+  },
+  "known_defect": {
+    "text": "An invented integer percentage below 50% is currently accepted when the sources contain a zero. Measured, documented, not yet fixed.",
+    "source_file": "backend/api/app.py",
+    "line": {
+      "value": 332
+    },
+    "read_on": "2026-10-22"
+  }
+}

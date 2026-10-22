@@ -1,0 +1,40 @@
+# One way to run everything:   docker compose up --build   then open http://localhost:8080
+# Demo mode is the default: no key and no network are needed once the images are built.
+# Only the website's port is published; the backend is reachable only from the website.
+services:
+  backend:
+    build: ./backend
+    environment:
+      CLIMATE_SUITE_MODE: ${CLIMATE_SUITE_MODE:-demo}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      SLM_URL: ${SLM_URL:-}
+      CLIMATE_SUITE_SLM: ${CLIMATE_SUITE_SLM:-off}
+    expose:
+      - "8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # for SLM_URL on the host (Windows, hf backend)
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE: /api
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  # The small language model service: an optional profile, NOT started by `docker compose up`.
+  #   docker compose --profile slm up --build
+  # It is untested (the image was not built in the release that added it). On Windows the recommended
+  # way is to run it on the host (see docs: hf backend, GPU) and give the backend SLM_URL, for example
+  # http://host.docker.internal:8001. No GPU is used inside Docker.
+  slm:
+    profiles: ["slm"]
+    build: ./slm
+    expose:
+      - "8001"
+    restart: unless-stopped

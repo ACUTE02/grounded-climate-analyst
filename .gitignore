@@ -1,0 +1,68 @@
+# private docs (never published)
+docs/
+
+# dependencies
+node_modules/
+
+# python virtual environments
+.venv/
+.venv-*/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# build output
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# backend: regenerable data, models and indexes (rebuilt by backend/scripts/setup.py);
+# the .json, .md and .png files in backend/models/ are saved evidence and stay tracked
+backend/data/
+# ... but the checked-in input-data snapshot (parquet files and manifest.json) is tracked
+!backend/data_snapshot/
+backend/models/*.joblib
+backend/models/*.parquet
+backend/models/generated/
+backend/models/generated_*/
+backend/retrieval/chunks.jsonl
+backend/retrieval/cache/
+backend/retrieval/chroma_store/
+backend/orchestrator/grounding_failures.jsonl
+
+# slm: local results, adapters and MLflow store (Phase 5)
+slm/outputs/
+slm/mlruns/
+# slm: training data left out of this release (the tests that need it skip when it is missing)
+slm/data/instruction/sft_train.jsonl
+slm/data/instruction/sft_train.sha256
+slm/data/instruction/dpo_train.jsonl
+slm/data/instruction/dpo_train.sha256
+slm/data/instruction/dpo2_mix.jsonl
+slm/data/instruction/dpo2_mix.sha256
+slm/README.md
+
+# local env files (real keys live here; only an example file with placeholders is published)
+.env
+.env.*
+!.env.example
+
+# keys and certificates
+*.pem
+*.key
+
+# large model weights (decided per file in a later phase)
+*.safetensors
+*.gguf
+
+# editor and OS files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# logs
+*.log

@@ -1,0 +1,18 @@
+# Running the service with the real `hf` backend on a local NVIDIA GPU (README, section "Run it locally").
+# Use a SEPARATE virtual environment for this file (for example `.venv-serve`). The project .venv (data, tests, tables) has no torch on purpose.
+#
+# These versions are the ones the Colab T4 run used (transformers 5.19.0, peft 0.21.2, torch 2.13.0, Python 3.13). accelerate 1.15.0 is the
+# version of the earlier Colab evaluation runs. NONE of this was tested on the author's laptop yet: a different Python or CUDA build may need
+# other versions.
+#
+# torch: on Windows the default pip wheel is a CPU build. Install the CUDA build FIRST, from the index shown on https://pytorch.org
+# (pick the CUDA tag that matches the driver that `nvidia-smi` reports), for example:
+#     pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cu<tag>
+# The CUDA tag is a placeholder: it was not checked. The torch line below is then already satisfied.
+#
+# requirements-serve.txt also lists mlflow; the service does not need it (only scripts/phase5_report.py --log-mlflow does).
+-r requirements-serve.txt
+torch==2.13.0
+transformers==5.19.0
+peft==0.21.2
+accelerate==1.15.0

@@ -1,0 +1,94 @@
+# Phase 5: serve a tuned model behind FastAPI, prove it answers like the evaluator, benchmark it.
+# Stage 1 (this file, laptop): models, service limits, backend names, vLLM settings to try. The benchmark block is the plan for
+# stage 2 and is not read by any code yet. The prompt (system message, "Context:..." user text), the refusal text and the greedy
+# decoding are NOT repeated here: they come from configs/phase1.yaml and configs/phase2.yaml (one copy only).
+
+# The model to serve is a config entry: a LoRA adapter on its base model. The one published adapter is loaded by its
+# Hugging Face id (adapter_id, public, Apache-2.0; LoRA rank 16, alpha 32); there is no local adapter path in this repository.
+# adapter_revision: optional git revision (a commit hash or tag) of the adapter repository to pin; null = the default branch.
+# parity_eval = the saved evaluator run (outputs/eval_<parity_eval>_val.json) that the parity check compares with.
+# Only this adapter is published: the 0.5B SFT and the 0.5B DPO v2 adapters are not part of this release.
+models:
+  sft_1.5b:  {label: "1.5B SFT",     adapter_id: GHOSTBHAIYA/climate-slm-1.5b-sft, adapter_revision: null,
+              base_model_id: Qwen/Qwen2.5-1.5B-Instruct, lora_rank: 16, lora_alpha: 32, parity_eval: q15_lora_fp16_e3}
+default_model: sft_1.5b
+
+backend:
+  default: hf                 # vllm | hf | fake. Overridden by the environment variable PHASE5_BACKEND. fake is for tests only.
+  env_backend: PHASE5_BACKEND
+  env_model: PHASE5_MODEL     # which entry of `models` this process serves (one model per process)
+  env_port: PHASE5_PORT       # overrides service.port (the scripts start one process per setting)
+  # PHASE5_HOST (optional environment variable) overrides service.host; a container sets 0.0.0.0, the default stays 127.0.0.1
+
+service:
+  host: 127.0.0.1             # no public bind by default
+  port: 8000
+  max_new_tokens: 256         # upper bound of the request field (1..256) and the default
+  max_model_len: 2048         # context window given to the backend
+  max_prompt_tokens: 1792     # = max_model_len - max_new_tokens. A longer prompt gets HTTP 413, never a silent cut.
+  log_level: INFO             # request id, latency, token counts; the context text is never logged
+  cors: false                 # no CORS middleware
+
+# vLLM settings. P5-0 (2026-10-21) ran with these: vLLM 0.32.0 loaded the base in half precision, served the LoRA adapter and gave
+# 3 of 3 outputs identical to the saved evaluator outputs. T4 has no bf16.
+vllm:
+  dtype: half
+  gpu_memory_utilization: 0.85
+  enable_lora: true           # serve the adapter with vLLM's LoRA support; the alternative is a merged float16 copy in /content
+  max_lora_rank: 16           # the Phase 3 / 4 adapters have r = 16
+  merged_dir: /content/merged # never inside the repo
+
+smoke:                        # cell P5-0: a few val prompts, nothing else (result: passed)
+  n_prompts: 3
+  split: val
+  model: sft_1.5b
+
+paths:
+  outputs_dir: outputs
+  results_dir: outputs/phase5              # raw results: parity_<backend>_<model>.json, bench_<backend>_<model>.json
+  mlruns_dir: outputs/mlruns               # same MLflow file store as the other phases
+  parity_summary: outputs/phase5/parity_summary.json   # written by scripts/parity_check.py, read by the benchmark (gate)
+  results_md: outputs/phase5_results.md    # tables made by scripts/phase5_report.py from the saved files
+  results_csv: outputs/phase5_bench.csv
+  start_zip: outputs/phase5_start.zip      # the three adapters + their saved val files, made on the laptop (collect --set phase5-start)
+
+# Both real backends collect requests that arrive together into one batch (serving/batching.py) and call the engine once per batch:
+# vLLM's offline LLM class (not the async engine) and the evaluator's HFBackend. A request that arrives while a batch is running
+# waits for the next batch. The same rule for both backends keeps the comparison fair; max_batch is each engine's own setting.
+batching:
+  window_ms: 5                # wait this long after the first request of a batch for more to arrive
+  max_batch: {vllm: 16, hf: 8}  # hf 8 = the evaluator's own batch size
+
+server:                        # how the scripts start a service process (one process per backend and model)
+  health_timeout_s: 900        # vLLM / hf model loading can take minutes
+  health_poll_s: 2
+  stop_timeout_s: 30
+  log_dir: outputs/phase5      # server_<backend>_<model>.log (no context text is logged)
+
+# Parity check (scripts/parity_check.py): all 53 val prompts through the live service, scored with the evaluator's scoring code,
+# compared with the saved outputs/eval_<parity_eval>_val.json. Rule fixed in advance: if a metric moves by more than this, STOP and
+# tell the reviewer before any benchmark (the benchmark script refuses to run for a model without a passed parity check).
+parity:
+  split: val
+  backends: [vllm]             # the vLLM output against the evaluator's saved files (the hf backend is the evaluator's own code)
+  models: [sft_1.5b]
+  concurrency: 1               # one request at a time, like a plain call
+  max_refusal_item_change: 1   # strict correct refusals and false refusals may each move by at most this many items
+  max_f1_change: 0.03          # answerable token F1 may move by at most this
+  run_name_prefix: svc         # outputs/eval_svc_<backend>_<parity_eval>_val.json (hidden from the Phase 2 report)
+
+# Benchmark (scripts/bench_serving.py): a client; val prompts only (the test split is never used), same prompts for every setting.
+bench:
+  split: val
+  concurrency: [1, 4, 16]
+  repeats: 3                   # every setting is repeated; min / median / max are reported, not one run
+  warmup_requests: 3           # per server start, excluded from the numbers
+  max_new_tokens: 256
+  backends: [vllm, hf]
+  models: [sft_1.5b]
+  gpu_sample_interval_s: 0.5   # nvidia-smi sampling of the used GPU memory during the runs
+  request_timeout_s: 600
+  too_close_rule: ranges_overlap   # two settings are "too close to separate" if their min..max ranges over the repeats overlap
+
+mlflow:
+  experiment_name: phase5_serving
