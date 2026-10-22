@@ -251,6 +251,7 @@ class FakeTool:
 
 def test_live_free_text_runs_the_pipeline_and_returns_a_rendered_report(monkeypatch):
     monkeypatch.setenv("CLIMATE_SUITE_MODE", "live")
+    monkeypatch.setenv("GEMINI_API_KEY", "fake-key-for-tests")   # a placeholder: the model and tools are faked
     question = "Will it be dry in Barmer next month?"
     drought = {"region": "barmer", "forecast_anchor_month": "2024-12-01", "predicted_values": [0.1, 0.2, 0.3],
                "horizon_confidence": [{"horizon": "t+1", "month": "2025-01-01", "skill_score": 0.2053,

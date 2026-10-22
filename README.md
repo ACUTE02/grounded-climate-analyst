@@ -89,7 +89,8 @@ Then, in both:
 
 If the key is missing the backend says so in its start-up log, and a question returns a report marked "REPORT NOT
 GENERATED". A daily-quota error comes back as HTTP 429 with an explanation. The saved examples are snapshots: asking the
-same question live can give different text.
+same question live can give different text. One live report was run on the author's machine (its calls and grounding
+result are in the author's run report, not in this repository).
 
 ## What the numbers say
 

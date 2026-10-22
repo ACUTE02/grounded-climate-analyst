@@ -88,6 +88,24 @@ describe("home page", () => {
     expect(JSON.parse(String((post[1] as RequestInit).body))).toEqual({ request: "will it be dry in Barmer?" });
   });
 
+  it("live mode: an error message from the backend (for example a missing key) is shown, not a broken page", async () => {
+    const message = "Live mode needs a Gemini key in backend/.env (GEMINI_API_KEY). See the README.";
+    mockApi((url, init) => {
+      if (url.endsWith("/health")) return { body: liveHealth };
+      if (url.endsWith("/examples")) return { body: { ...examples, mode: "live" } };
+      if (init?.method === "POST") return { status: 503, body: { detail: message } };
+      return { status: 404, body: {} };
+    });
+    renderAt("/");
+    const box = await screen.findByRole("textbox");
+    await waitFor(() => expect(box).toBeEnabled());
+    await userEvent.type(box, "will it rain?");
+    await userEvent.click(screen.getByRole("button", { name: "Ask" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(message);
+    expect(screen.getByRole("button", { name: "Ask" })).toBeEnabled();
+    expect(screen.getByText("Saved examples")).toBeInTheDocument();
+  });
+
   it("says plainly when the backend cannot be reached", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("network"); }));
     renderAt("/");

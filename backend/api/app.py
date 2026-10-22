@@ -65,6 +65,8 @@ app.add_middleware(
 
 app.include_router(slm_router)
 
+NO_KEY_MESSAGE = "Live mode needs a Gemini key in backend/.env (GEMINI_API_KEY). See the README."
+
 
 # --------------------------------------------------------------------------- #
 # Response shaping — promote honesty signals to structured fields
@@ -229,6 +231,12 @@ def create_report(body: ReportRequest) -> dict:
         return {**saved, "quota": quota.demo_status()}
 
     from orchestrator.graph import analyse
+    from retrieval.embed import MissingAPIKey, get_api_key
+
+    try:
+        get_api_key()
+    except MissingAPIKey:
+        raise HTTPException(status_code=503, detail=NO_KEY_MESSAGE) from None
 
     try:
         state = analyse(request=body.request, region=body.region,

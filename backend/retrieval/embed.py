@@ -59,8 +59,7 @@ def get_api_key() -> str:
     raise MissingAPIKey(
         "No Gemini API key found. Set one of "
         f"{', '.join(config.API_KEY_ENV_VARS)} and re-run. A free key comes from "
-        "https://aistudio.google.com/apikey — the corpus and chunks are already "
-        "built, so only the embedding step needs it. A backend/.env file "
+        "https://aistudio.google.com/apikey. A backend/.env file "
         "with GEMINI_API_KEY=... also works and is gitignored."
     )
 

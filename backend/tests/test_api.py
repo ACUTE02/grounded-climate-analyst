@@ -70,6 +70,7 @@ def fake_state(**overrides) -> dict:
 def live_mode(monkeypatch):
     """These tests exercise the live API; demo mode (the default) has its own tests."""
     monkeypatch.setenv("CLIMATE_SUITE_MODE", "live")
+    monkeypatch.setenv("GEMINI_API_KEY", "fake-key-for-tests")   # a placeholder: the pipeline itself is faked
 
 
 @pytest.fixture
@@ -422,3 +423,44 @@ def test_live_report_is_well_formed():
     assert body["grounding"]["total_checked"] > 0
     assert "forecast_drought_risk" in body["tools_called"]
     assert len(body["horizon_confidence"]) == 3
+
+
+# --------------------------------------------------------------------------- #
+# Live mode without a key: one clear line, before anything runs
+# --------------------------------------------------------------------------- #
+@pytest.fixture
+def no_key(monkeypatch, tmp_path):
+    from retrieval import config as rconfig
+
+    monkeypatch.setattr(rconfig, "REPO_ROOT", tmp_path)          # no backend/.env is read
+    for var in (*rconfig.API_KEY_ENV_VARS, "OPENAI_API_KEY"):
+        monkeypatch.delenv(var, raising=False)
+
+
+def test_live_mode_without_a_key_is_a_503_with_one_clear_line(no_key, monkeypatch):
+    def boom(**kwargs):
+        raise AssertionError("the pipeline ran although there is no key")
+
+    monkeypatch.setattr("orchestrator.graph.analyse", boom)
+    response = client.post("/report", json={"request": "what is the drought risk?"})
+    assert response.status_code == 503
+    assert response.json()["detail"] == ("Live mode needs a Gemini key in backend/.env (GEMINI_API_KEY). "
+                                         "See the README.")
+
+
+def test_the_no_key_error_has_no_trace_and_names_no_key_value(no_key, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-not-a-gemini-key")   # an unrelated key does not count
+    text = client.post("/report", json={"request": "q"}).text
+    assert "Traceback" not in text and "sk-not-a-gemini-key" not in text and "MissingAPIKey" not in text
+
+
+def test_a_key_lets_the_request_through(mock_analyse):
+    calls = mock_analyse(fake_state())
+    assert client.post("/report", json={"request": "q"}).status_code == 200
+    assert calls["request"] == "q"
+
+
+def test_demo_mode_does_not_ask_for_a_key(no_key, monkeypatch):
+    monkeypatch.setenv("CLIMATE_SUITE_MODE", "demo")
+    response = client.post("/report", json={"request": "not a saved example"})
+    assert response.status_code == 409          # the demo refusal, not the key message
