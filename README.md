@@ -87,8 +87,8 @@ Then, in both:
 4. In a second terminal: `cd frontend`, `npm install`, `npm run dev`, then open http://localhost:5173 and type a
    question on the Ask page.
 
-If the key is missing the backend says so in its start-up log, and a question returns a report marked "REPORT NOT
-GENERATED". A daily-quota error comes back as HTTP 429 with an explanation. The saved examples are snapshots: asking the
+If the key is missing the backend says so in its start-up log, and a question returns HTTP 503 with "Live mode needs a
+Gemini key in backend/.env (GEMINI_API_KEY). See the README." A daily-quota error comes back as HTTP 429 with an explanation. The saved examples are snapshots: asking the
 same question live can give different text. One live report was run on the author's machine (its calls and grounding
 result are in the author's run report, not in this repository).
 
