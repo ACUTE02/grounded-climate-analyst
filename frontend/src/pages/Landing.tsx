@@ -48,10 +48,10 @@ export default function Landing() {
           </Link>
           <Link to="/slm" className="product">
             <span className="eyebrow">Climate SLM</span>
-            <h3>A small model that answers only from a passage</h3>
+            <h3>A small model that answers only from the text it is given</h3>
             <p className="muted">
-              Give it a passage and a question. It answers from that passage, or says it cannot. Experimental, and
-              separate from the analyst.
+              Ask about the project's own report and source passages, or paste a passage. It answers from that text, or says
+              it cannot. Experimental, and separate from the analyst.
             </p>
           </Link>
         </div>

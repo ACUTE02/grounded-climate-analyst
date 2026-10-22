@@ -14,7 +14,7 @@ import { demoHealth, examples } from "./fixtures";
 
 const PAGES: [string, RegExp][] = [
   ["Analyst", /Ask about drought, heat and crops/],
-  ["SLM", /answers from the passage you give it/],
+  ["SLM", /answers only from the text it is given/],
   ["Evidence", /What was measured, and where it was read from/],
   ["About", /What this release is, and what it is not/],
   ["Home", /how far to trust each number/],

@@ -135,6 +135,9 @@ export interface SlmAnswer {
   answer: string;
   refused: boolean;
   model: string | null;
+  /** only on /slm/ask: where the context came from */
+  sources?: { kind: string; name: string }[];
+  truncated?: boolean;
 }
 
 export interface DemoRefusal {

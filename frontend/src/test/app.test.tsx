@@ -278,7 +278,7 @@ describe("static pages", () => {
     expect(note).toHaveTextContent("PHASE5_PORT=8001");
     expect(note).toHaveTextContent("SLM_URL=http://127.0.0.1:8001");
     expect(screen.getByRole("button", { name: "Ask" })).toBeDisabled();
-    expect(screen.getByLabelText(/^Passage/)).toBeDisabled();
+    expect(screen.getByLabelText(/^Question/)).toBeDisabled();
   });
 
   it("SLM Try it: sends the passage and question, shows the answer, refused flag and model", async () => {
@@ -289,10 +289,11 @@ describe("static pages", () => {
       return { body: demoHealth };
     });
     renderAt("/slm");
-    const button = screen.getByRole("button", { name: "Ask" });
-    await waitFor(() => expect(button).toBeEnabled());
+    await waitFor(() => expect(screen.getByLabelText(/^Question/)).toBeEnabled());
+    await userEvent.click(screen.getByLabelText("A passage I paste"));
     expect((screen.getByLabelText(/^Passage/) as HTMLTextAreaElement).value).toContain("Barmer");
-    await userEvent.click(button);
+    await userEvent.type(screen.getByLabelText(/^Question/), "In which state is Barmer?");
+    await userEvent.click(screen.getByRole("button", { name: "Ask" }));
     const result = await screen.findByTestId("slm-result");
     expect(result).toHaveTextContent("Rajasthan.");
     expect(result).toHaveTextContent("refused: false");
@@ -315,9 +316,10 @@ describe("static pages", () => {
       return { body: demoHealth };
     });
     renderAt("/slm");
-    const button = screen.getByRole("button", { name: "Ask" });
-    await waitFor(() => expect(button).toBeEnabled());
-    await userEvent.click(button);
+    await waitFor(() => expect(screen.getByLabelText(/^Question/)).toBeEnabled());
+    await userEvent.click(screen.getByLabelText("A passage I paste"));
+    await userEvent.type(screen.getByLabelText(/^Question/), "A first question?");
+    await userEvent.click(screen.getByRole("button", { name: "Ask" }));
     expect(await screen.findByTestId("slm-result")).toHaveTextContent("refused: true");
     await userEvent.type(screen.getByLabelText(/^Question/), "And a second question?");
     await userEvent.click(screen.getByRole("button", { name: "Ask" }));
@@ -329,6 +331,9 @@ describe("static pages", () => {
       body: url.endsWith("/slm/status") ? { configured: true, available: true, model: "fake-slm", message: "" } : demoHealth,
     }));
     renderAt("/slm");
+    await waitFor(() => expect(screen.getByLabelText(/^Question/)).toBeEnabled());
+    await userEvent.click(screen.getByLabelText("A passage I paste"));
+    await userEvent.type(screen.getByLabelText(/^Question/), "q?");
     const button = screen.getByRole("button", { name: "Ask" });
     await waitFor(() => expect(button).toBeEnabled());
     const box = screen.getByLabelText(/^Passage/);
@@ -364,7 +369,7 @@ describe("landing and navigation", () => {
     expect(await screen.findByRole("heading", { level: 1 })).toHaveTextContent(/how far to trust each number/);
     expect(screen.getByText(/no key and no network/)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Forecasts with an honest label on every month" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "A small model that answers only from a passage" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "A small model that answers only from the text it is given" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "How it works" })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 3 }).length).toBeGreaterThanOrEqual(5);
     // every proof number carries its source file in the hover title
@@ -403,25 +408,32 @@ describe("landing and navigation", () => {
 describe("SLM chat", () => {
   const up = { configured: true, available: true, model: "fake-slm", message: "" };
 
-  it("shows each question and answer as a turn, marks a refusal, and shows status and model badges", async () => {
+  it("shows each question and answer as a turn, marks a refusal, and shows status, model and sources", async () => {
     let n = 0;
     mockApi((url, init) => {
       if (url.endsWith("/slm/status")) return { body: up };
-      if (url.endsWith("/slm/answer") && init?.method === "POST") {
+      if (url.endsWith("/examples")) return { body: examples };
+      if (url.endsWith("/slm/ask") && init?.method === "POST") {
         n += 1;
         return { body: n === 1
-          ? { answer: "Rajasthan.", refused: false, model: "fake-slm" }
-          : { answer: "I cannot answer this from the provided context.", refused: true, model: "fake-slm" } };
+          ? { answer: "The next month is validated.", refused: false, model: "fake-slm",
+              sources: [{ kind: "report", name: "report: q1" }, { kind: "corpus", name: "SPI guide" }], truncated: true }
+          : { answer: "I cannot answer this from the provided context.", refused: true, model: "fake-slm",
+              sources: [{ kind: "corpus", name: "SPI guide" }], truncated: false } };
       }
       return { body: demoHealth };
     });
     renderAt("/slm");
     await waitFor(() => expect(screen.getByTestId("slm-state")).toHaveTextContent("service running"));
     expect(screen.getByTestId("slm-model-badge")).toHaveTextContent("fake-slm");
+    expect(screen.getByLabelText("The project's report and source corpus")).toBeChecked();
+    expect(await screen.findByRole("option", { name: "Drought next month, Rajasthan" })).toBeInTheDocument();
+    await userEvent.selectOptions(screen.getByLabelText("Report to include"), "drought_one_month");
+    await userEvent.type(screen.getByLabelText(/^Question/), "Can I trust next month?");
     await userEvent.click(screen.getByRole("button", { name: "Ask" }));
-    expect(await screen.findByText("Rajasthan.")).toBeInTheDocument();
-    const box = screen.getByLabelText(/^Question/);
-    await userEvent.type(box, "What is the capital of France?");
+    expect(await screen.findByText("The next month is validated.")).toBeInTheDocument();
+    expect(screen.getByTestId("slm-sources")).toHaveTextContent("report: report: q1; corpus: SPI guide (some text was cut to fit)");
+    await userEvent.type(screen.getByLabelText(/^Question/), "What is the capital of France?");
     await userEvent.click(screen.getByRole("button", { name: "Ask" }));
     const results = await screen.findAllByTestId("slm-result");
     expect(results).toHaveLength(2);
@@ -431,6 +443,24 @@ describe("SLM chat", () => {
     expect(screen.getByText("What is the capital of France?")).toHaveClass("bubble", "q");
   });
 
+  it("project mode posts only the question and the chosen report id to /slm/ask", async () => {
+    const fetchMock = mockApi((url, init) => {
+      if (url.endsWith("/slm/status")) return { body: up };
+      if (url.endsWith("/examples")) return { body: examples };
+      if (url.endsWith("/slm/ask") && init?.method === "POST")
+        return { body: { answer: "ok", refused: false, model: "fake-slm", sources: [], truncated: false } };
+      return { body: demoHealth };
+    });
+    renderAt("/slm");
+    await screen.findByRole("option", { name: "Drought next month, Rajasthan" });
+    await waitFor(() => expect(screen.getByLabelText(/^Question/)).toBeEnabled());
+    await userEvent.type(screen.getByLabelText(/^Question/), "No report chosen?");
+    await userEvent.click(screen.getByRole("button", { name: "Ask" }));
+    await screen.findByTestId("slm-result");
+    const post = fetchMock.mock.calls.find(([u]) => String(u).endsWith("/slm/ask"))!;
+    expect(JSON.parse(String((post[1] as RequestInit).body))).toEqual({ question: "No report chosen?" });
+  });
+
   it("each turn sends the passage as currently edited", async () => {
     const fetchMock = mockApi((url, init) => {
       if (url.endsWith("/slm/status")) return { body: up };
@@ -438,8 +468,10 @@ describe("SLM chat", () => {
       return { body: demoHealth };
     });
     renderAt("/slm");
+    await waitFor(() => expect(screen.getByLabelText(/^Question/)).toBeEnabled());
+    await userEvent.click(screen.getByLabelText("A passage I paste"));
     const passage = screen.getByLabelText(/^Passage/);
-    await waitFor(() => expect(passage).toBeEnabled());
+    await userEvent.type(screen.getByLabelText(/^Question/), "q?");
     fireEvent.change(passage, { target: { value: "My own passage." } });
     await userEvent.click(screen.getByRole("button", { name: "Ask" }));
     await screen.findByTestId("slm-result");

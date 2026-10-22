@@ -63,7 +63,13 @@ export const postSlmAnswer = (context: string, question: string) =>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ context, question }),
   });
-export const postReport =(body: ReportRequestBody) =>
+export const postSlmAsk = (question: string, reportId: string | null) =>
+  request<SlmAnswer>("/slm/ask", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(reportId ? { question, report_id: reportId } : { question }),
+  });
+export const postReport = (body: ReportRequestBody) =>
   request<ReportResponse>("/report", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

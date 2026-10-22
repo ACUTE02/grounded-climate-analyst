@@ -33,7 +33,7 @@ This repository holds the backend (Python, FastAPI), the website (React), and a 
 - 📚 **Retrieval over a document corpus (Track A)** — plain dense search is the default; hybrid search and re-ranking were built, measured, and left off
 - 🤖 **Optional small language model step** — asks a fine-tuned 1.5B model about the first retrieved passages; **off by default** and not used to write the report
 - 🧪 **Demo mode** — runs with no key and no network, on six saved examples
-- 🖥️ **Website** — Ask page, Evidence page (each number is read from a saved file), and an SLM page with a "Try it" card
+- 🖥️ **Website** — Home, Analyst (saved examples, and free-text questions in live mode), SLM (a chat that answers only from the text it is given), Evidence (each number is read from a saved file) and About
 
 ## 🏗️ Architecture
 
@@ -78,9 +78,10 @@ In **demo mode** there is no live routing or writing: the website shows six save
 ## 📁 Project Structure
 
 ```
-climate-suite/
+grounded-climate-analyst/
 ├── backend/
 │   ├── api/                # FastAPI app
+│   ├── demo/               # The six saved examples (demo mode)
 │   ├── retrieval/          # Retrieval and its evaluation results
 │   ├── evaluation/         # Number-checker evaluation
 │   ├── models/             # Forecast manifests (the evidence files)
@@ -113,7 +114,7 @@ Skill is 1 minus the model's error divided by the error of always predicting the
 
 ### 🔎 Retrieval: a negative result, kept on purpose
 
-On an easier document-level test (right document, 9 documents, 12 queries) plain search finds the right document every time. On a stricter paragraph-level test (1,015 hand-labelled paragraphs, 25 questions) top-5 precision was lower, and hybrid search and re-ranking did not help:
+On an easier document-level test (12 queries, top 5) plain search finds the right document every time. On a stricter paragraph-level test against hand-labelled paragraphs (25 questions: 12 regular and 13 hard) top-5 precision was lower, and hybrid search and re-ranking did not help:
 
 | Setup | Top-5 precision (easier / harder questions) |
 |---|---|
@@ -126,7 +127,7 @@ These were measured on the original 224-chunk corpus. The corpus built on a fres
 
 ### 🤖 Small language model (separate project, quoted from its own README)
 
-A Qwen2.5-1.5B-Instruct model with a LoRA adapter, tuned on six Indian government climate and disaster documents to answer from a passage or reply exactly "I cannot answer this from the provided context."
+A Qwen2.5-1.5B-Instruct model with a LoRA adapter, tuned to answer from a passage or reply exactly "I cannot answer this from the provided context."
 
 | Model (test split, 43 items) | Token F1 (95% interval) | False refusals | Correct refusals |
 |---|---|---|---|
@@ -208,7 +209,7 @@ The real 1.5B SFT adapter was downloaded from Hugging Face and served on the aut
 
 The analyst has an optional step that asks the small language model about the first retrieved passages (`CLIMATE_SUITE_SLM=on` and `SLM_URL`; **off by default**). The SLM service and the backend both default to port 8000, so start the SLM on another port (`PHASE5_PORT=8001`) and set `SLM_URL=http://127.0.0.1:8001` for the backend. Its answers are shown next to the report and are not used to write it or to check its numbers.
 
-The website's SLM page has a "Try it" card: you paste a passage and a question and the backend forwards them to the SLM service (`POST /slm/answer`, passage at most 4000 characters, question at most 500; nothing is stored or logged). It works in demo mode too, because it uses no Gemini call, but only when `SLM_URL` is set and the service is running; otherwise the card is off and says how to start it. In Docker, set `SLM_URL=http://host.docker.internal:8001` for an SLM running on the host (empty by default). The model is small and experimental, and no claim is made about how fast or how accurate it is.
+The website's SLM page is a chat. Each question is answered from a text the SLM service is given: either a passage you paste (`POST /slm/answer`) or the project's own material (`POST /slm/ask`): a saved report with its forecast labels plus the best-matching passages of the source corpus (keyword search over `retrieval/chunks.jsonl`, no key), assembled by the backend. The raw weather tables are not given to the model. At most 4000 characters of text and 500 of question go to the service, so long material is cut and the page says so; nothing is stored or logged. It works in demo mode too, because it uses no Gemini call, but only when `SLM_URL` is set and the service is running; otherwise the chat is off and says how to start it. In Docker the corpus is not built, so only the report part is available there; set `SLM_URL=http://host.docker.internal:8001` for an SLM running on the host (empty by default). The model was trained on passage questions: how well it answers from this mixed material has not been measured, and no claim is made about how fast or how accurate it is.
 
 The training data is not included in this release (the tests that need it skip when it is missing). The Colab and benchmark scripts and the notebook are kept for reference only: the 0.5B and DPO adapters they refer to were not published.
 
@@ -225,6 +226,7 @@ The training data is not included in this release (the tests that need it skip w
 ```bash
 cd backend && python -m pytest          # live tests are opt-in (RUN_LIVE_* variables)
 cd frontend && npm test
+cd slm && python -m pytest tests        # some tests skip when the training data is not present
 ```
 
 ## 🗂️ Data and Credit

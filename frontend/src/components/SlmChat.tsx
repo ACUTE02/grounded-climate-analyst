@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { getSlmStatus, postSlmAnswer } from "../api/client";
-import type { SlmStatus } from "../api/types";
+import { getExamples, getSlmStatus, postSlmAnswer, postSlmAsk } from "../api/client";
+import type { ExampleItem, SlmStatus } from "../api/types";
 
 export const MAX_CONTEXT = 4000;
 export const MAX_QUESTION = 500;
@@ -10,23 +10,31 @@ export const REFUSAL_SENTENCE = "I cannot answer this from the provided context.
 const EXAMPLE_PASSAGE =
   "Barmer is a district in the west of Rajasthan, on the border with Pakistan. " +
   "Much of the district lies in the Thar desert, and most farms depend on rain.";
-const EXAMPLE_QUESTION = "In which state is Barmer?";
+
+type Source = "project" | "passage";
 
 interface Turn {
   id: number;
   question: string;
+  source: Source;
   passage: string;
+  reportId: string | null;
   answer?: string;
   refused?: boolean;
   model?: string | null;
+  used?: { kind: string; name: string }[];
+  truncated?: boolean;
   error?: string;
 }
 
 /** Passage-grounded Q&A shown as a conversation. Every turn sends the passage above with the new question. */
 export default function SlmChat() {
   const [status, setStatus] = useState<SlmStatus | null>(null);
+  const [source, setSource] = useState<Source>("project");
+  const [reports, setReports] = useState<ExampleItem[]>([]);
+  const [reportId, setReportId] = useState("");
   const [passage, setPassage] = useState(EXAMPLE_PASSAGE);
-  const [question, setQuestion] = useState(EXAMPLE_QUESTION);
+  const [question, setQuestion] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [busy, setBusy] = useState(false);
   const next = useRef(1);
@@ -35,22 +43,34 @@ export default function SlmChat() {
     getSlmStatus()
       .then(setStatus)
       .catch(() => setStatus({ configured: false, available: false, model: null, message: "" }));
+    getExamples()
+      .then((r) => setReports(Array.isArray(r.examples) ? r.examples : []))
+      .catch(() => setReports([]));
   }, []);
 
   const available = status?.available === true;
-  const tooLong = passage.length > MAX_CONTEXT || question.length > MAX_QUESTION;
-  const ready = available && !busy && !tooLong && passage.trim() !== "" && question.trim() !== "";
+  const tooLong = (source === "passage" && passage.length > MAX_CONTEXT) || question.length > MAX_QUESTION;
+  const ready = available && !busy && !tooLong && (source === "project" || passage.trim() !== "") && question.trim() !== "";
 
   async function ask(event: FormEvent) {
     event.preventDefault();
     if (!ready) return;
-    const turn: Turn = { id: next.current++, question: question.trim(), passage };
+    const turn: Turn = { id: next.current++, question: question.trim(), source, passage, reportId: reportId || null };
     setTurns((t) => [...t, turn]);
     setQuestion("");
     setBusy(true);
     try {
-      const r = await postSlmAnswer(turn.passage, turn.question);
-      setTurns((t) => t.map((x) => (x.id === turn.id ? { ...x, answer: r.answer, refused: r.refused, model: r.model } : x)));
+      const r =
+        turn.source === "project"
+          ? await postSlmAsk(turn.question, turn.reportId)
+          : await postSlmAnswer(turn.passage, turn.question);
+      setTurns((t) =>
+        t.map((x) =>
+          x.id === turn.id
+            ? { ...x, answer: r.answer, refused: r.refused, model: r.model, used: r.sources, truncated: r.truncated }
+            : x,
+        ),
+      );
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       setTurns((t) => t.map((x) => (x.id === turn.id ? { ...x, error: message } : x)));
@@ -71,8 +91,9 @@ export default function SlmChat() {
         {status?.model && <span className="pill" data-testid="slm-model-badge">{status.model}</span>}
       </div>
       <p className="small muted">
-        This is not a general chatbot. It answers a question from the passage you give it, or replies "
-        {REFUSAL_SENTENCE}" It is a small, experimental model and it can be wrong.
+        This is not a general chatbot. It answers from the text it is given, or replies "{REFUSAL_SENTENCE}" It is a
+        small, experimental model and it can be wrong; how well it answers from this project's material has not been
+        measured.
       </p>
 
       {status && !available && (
@@ -89,17 +110,39 @@ export default function SlmChat() {
       )}
 
       <div className="chat">
-        <div className="passage">
-          <label htmlFor="slm-context" style={{ marginTop: 0 }}>
-            Passage the answers must come from ({passage.length}/{MAX_CONTEXT} characters). You can edit it between questions.
+        <fieldset className="passage" style={{ margin: 0 }}>
+          <legend className="small muted">Answer from</legend>
+          <label style={{ display: "inline-flex", gap: 6, marginRight: 16 }}>
+            <input type="radio" name="slm-source" checked={source === "project"} onChange={() => setSource("project")} />
+            The project's report and source corpus
           </label>
-          <textarea
-            id="slm-context"
-            value={passage}
-            onChange={(e) => setPassage(e.target.value)}
-            disabled={!available || busy}
-          />
-        </div>
+          <label style={{ display: "inline-flex", gap: 6 }}>
+            <input type="radio" name="slm-source" checked={source === "passage"} onChange={() => setSource("passage")} />
+            A passage I paste
+          </label>
+          {source === "project" ? (
+            <>
+              <label htmlFor="slm-report">Report to include</label>
+              <select id="slm-report" value={reportId} onChange={(e) => setReportId(e.target.value)} disabled={!available || busy}>
+                <option value="">No report (source corpus only)</option>
+                {reports.map((r) => (
+                  <option key={r.id} value={r.id}>{r.label}</option>
+                ))}
+              </select>
+              <p className="small muted" style={{ margin: "8px 0 0" }}>
+                The backend gives the model the chosen report, its forecast labels and the best-matching passages of the
+                source corpus (at most {MAX_CONTEXT} characters in all). The raw weather tables are not given to it.
+              </p>
+            </>
+          ) : (
+            <>
+              <label htmlFor="slm-context">
+                Passage the answers must come from ({passage.length}/{MAX_CONTEXT} characters). You can edit it between questions.
+              </label>
+              <textarea id="slm-context" value={passage} onChange={(e) => setPassage(e.target.value)} disabled={!available || busy} />
+            </>
+          )}
+        </fieldset>
 
         <div className="thread" role="log" aria-live="polite" aria-label="Conversation">
           {turns.length === 0 && <p className="muted small">No questions yet.</p>}
@@ -116,6 +159,12 @@ export default function SlmChat() {
                   <span className="tag">
                     refused: {String(t.refused)} · model: {t.model ?? "not reported"}
                   </span>
+                  {t.used && t.used.length > 0 && (
+                    <span className="tag" data-testid="slm-sources">
+                      from: {t.used.map((s) => `${s.kind}: ${s.name}`).join("; ")}
+                      {t.truncated ? " (some text was cut to fit)" : ""}
+                    </span>
+                  )}
                 </div>
               )}
             </div>

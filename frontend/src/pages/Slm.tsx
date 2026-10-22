@@ -6,15 +6,17 @@ export default function Slm() {
   return (
     <>
       <p className="eyebrow">Climate SLM</p>
-      <h1>A small model that answers from the passage you give it.</h1>
+      <h1>A small model that answers only from the text it is given.</h1>
       <div className="calm" data-testid="slm-status">
         <strong>{slm.status}</strong> It is a separate piece of work that answers a question from a given passage or
         says it cannot. Nothing on this page claims that it improves the climate analyst.
       </div>
       <p className="lede">
-        Passage-grounded question answering: you supply the passage and the question, and the answer may use only
-        that passage. If the passage does not contain the answer, the model is trained to refuse with one fixed
-        sentence.
+        Passage-grounded question answering. The text can be a passage you paste, or the project's own material: a report
+        with its forecast labels plus the best-matching passages of the source corpus, picked by the backend. The answer
+        may use only that text; if it does not contain the answer, the model is trained to refuse with one fixed
+        sentence. It was trained on passage questions: how well it does on the project's mixed material has not been
+        measured.
       </p>
 
       <section className="block">
