@@ -1,5 +1,4 @@
 import "@fontsource-variable/bricolage-grotesque";
-import "@fontsource-variable/fraunces";
 import "@fontsource-variable/martian-mono";
 import "./theme.css";
 

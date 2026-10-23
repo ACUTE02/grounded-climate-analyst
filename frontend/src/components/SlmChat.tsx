@@ -92,9 +92,7 @@ export default function SlmChat() {
         {status?.model && <span className="pill" data-testid="slm-model-badge">{status.model}</span>}
       </div>
       <p className="small muted">
-        This is not a general chatbot. It answers from the text it is given, or replies "{REFUSAL_SENTENCE}" It is a
-        small, experimental model and it can be wrong; how well it answers from this project's material has not been
-        measured.
+        This is not a general chatbot. It answers only from the text it is given, or replies "{REFUSAL_SENTENCE}" It can be wrong.
       </p>
 
       {status && !available && (

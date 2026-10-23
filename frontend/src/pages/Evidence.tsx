@@ -5,6 +5,7 @@ import trackaJson from "../data/tracka.json";
 import type { Checker, Drought, Heat, TrackA } from "../data/types";
 import { badgeKind } from "../components/HorizonBadges";
 import { N, SrcLine } from "../components/Num";
+import { SkillChart, SkillLegend } from "../components/SkillChart";
 import { Table, slm } from "../components/SlmTables";
 import { useState } from "react";
 
@@ -27,12 +28,14 @@ export default function Evidence() {
   const noReproduction = drought.reproduced_file === null;
   return (
     <>
-      <p className="eyebrow">Evidence</p>
-      <h1>What was measured, and where it was read from.</h1>
-      <p className="muted" style={{ maxWidth: "64ch" }}>
-        Every number on this page is read from a saved result file by a script, and the file is named next
-        to it. Hover a number to see the exact place it came from.
-      </p>
+      <div className="page-head">
+        <p className="eyebrow">Evidence</p>
+        <h1>What was measured, and where it was read from.</h1>
+        <p className="lede">
+          Every number on this page is read from a saved result file by a script, and the file is named next
+          to it. Hover a number to see the exact place it came from.
+        </p>
+      </div>
 
       <div className="tabs" role="tablist" aria-label="Evidence sections">
         {TABS.map((x) => (
@@ -51,9 +54,16 @@ export default function Evidence() {
           normal: 0 means no better than the normal, higher is better. The right-hand columns are the
           values reproduced on this clone by <code>python -m scripts.setup</code>.
         </p>
+        <div className="chart-set" style={{ margin: "16px 0 4px" }}>
+          {Object.entries(drought.regions).map(([region, rows]) => (
+            <SkillChart key={region} region={region} rows={rows} />
+          ))}
+        </div>
+        <SkillLegend />
         {Object.entries(drought.regions).map(([region, rows]) => (
-          <div key={region} className="table-wrap" style={{ marginBottom: 16 }}>
-            <h3>{region}</h3>
+          <div key={region} style={{ marginBottom: 16 }}>
+            <h3 style={{ textTransform: "capitalize", marginTop: 20 }}>{region}</h3>
+            <div className="table-wrap">
             <table>
               <thead>
                 <tr>
@@ -86,6 +96,7 @@ export default function Evidence() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         ))}
         <SrcLine file={drought.published_file} />
@@ -107,8 +118,9 @@ export default function Evidence() {
           was observed and offers no forecast.
         </p>
         {Object.entries(heat.regions).map(([region, rows]) => (
-          <div key={region} className="table-wrap">
-            <h3>{region}</h3>
+          <div key={region}>
+            <h3 style={{ textTransform: "capitalize" }}>{region}</h3>
+            <div className="table-wrap">
             <table>
               <thead>
                 <tr><th>Horizon</th><th>Verdict</th><th className="num">Skill</th></tr>
@@ -123,6 +135,7 @@ export default function Evidence() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         ))}
         <SrcLine file={heat.manifest_file} />
@@ -179,8 +192,9 @@ export default function Evidence() {
         <h3>Strict test (chunk level, human-labelled passages)</h3>
         <p className="muted small">{tracka.strict.metric_note}</p>
         {(["soft", "hard"] as const).map((set) => (
-          <div key={set} className="table-wrap" style={{ marginBottom: 12 }}>
+          <div key={set} style={{ marginBottom: 12 }}>
             <h3>{set === "soft" ? "Regular question set" : "Hard question set"}</h3>
+            <div className="table-wrap">
             <table>
               <thead>
                 <tr><th>Search</th><th className="num">Questions</th><th className="num">Precision at 5</th><th className="num">MRR</th></tr>
@@ -196,6 +210,7 @@ export default function Evidence() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         ))}
         <p className="small muted">{tracka.strict.pooling_assumption}</p>

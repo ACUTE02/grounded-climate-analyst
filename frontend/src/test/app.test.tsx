@@ -373,7 +373,7 @@ describe("landing and navigation", () => {
     expect(screen.getByRole("heading", { name: "How it works" })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 3 }).length).toBeGreaterThanOrEqual(5);
     // every proof number carries its source file in the hover title
-    const proofs = screen.getByRole("heading", { name: "What was measured" }).parentElement!;
+    const proofs = screen.getByRole("heading", { name: "What was measured" }).closest("section")!;
     const sources = proofs.querySelectorAll("span[title]");
     expect(sources.length).toBeGreaterThanOrEqual(4);
     sources.forEach((s) => expect(s.getAttribute("title")).toMatch(/\.json/));

@@ -8,8 +8,10 @@ const about = aboutJson as unknown as AboutData;
 export default function About() {
   return (
     <>
-      <p className="eyebrow">About</p>
-      <h1>What this release is, and what it is not.</h1>
+      <div className="page-head">
+        <p className="eyebrow">About</p>
+        <h1>What this release is, and what it is not.</h1>
+      </div>
 
       <section className="card">
         <h2>Included</h2>

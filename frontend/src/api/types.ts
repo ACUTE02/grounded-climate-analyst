@@ -112,6 +112,7 @@ export interface ExamplesResponse {
   mode: string;
   examples: ExampleItem[];
   cost_warning: string;
+  quota?: { daily_call_budget?: number; calls_remaining_today?: number };
   supported_regions: string[];
   supported_crops: string[];
 }
@@ -122,6 +123,9 @@ export interface Health {
   api_key_present: boolean;
   horizon_manifest_source: string;
   note: string;
+  chroma_index_ready?: boolean;
+  data_currency?: Record<string, { data_current_through?: string } | undefined>;
+  quota?: { daily_call_budget?: number; calls_remaining_today?: number };
 }
 
 export interface SlmStatus {

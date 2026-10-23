@@ -13,17 +13,17 @@ const GROUNDING_MEANING: Record<string, string> = {
 
 function Fact({ name, value }: { name: string; value: ReactNode }) {
   return (
-    <tr>
-      <th scope="row">{name}</th>
-      <td>{value}</td>
-    </tr>
+    <>
+      <dt>{name}</dt>
+      <dd>{value}</dd>
+    </>
   );
 }
 
 const show = (v: unknown): string =>
   v === null || v === undefined ? "none" : typeof v === "object" ? JSON.stringify(v) : String(v);
 
-export default function ReportView({ report }: { report: ReportResponse }) {
+export default function ReportView({ report, crumb }: { report: ReportResponse; crumb?: ReactNode }) {
   const { meta, grounding } = report;
   const drought = report.tool_outputs["forecast_drought_risk"];
   const heat = report.tool_outputs["forecast_heat_stress_risk"];
@@ -34,14 +34,36 @@ export default function ReportView({ report }: { report: ReportResponse }) {
   }
   const hasReport = report.report.trim().length > 0;
 
+  const reliable = report.horizon_confidence.filter((h) => h.reliable).length;
+  const sections = [
+    report.horizon_confidence.length > 0 && { id: "h-horizons", label: "How far to trust it" },
+    (heat || crop) && { id: "h-obs", label: "What the tools found" },
+    { id: "h-data", label: "What the system lacks" },
+    { id: "h-ground", label: "Number check" },
+    { id: "h-report", label: "Written report" },
+    report.slm?.enabled && { id: "h-slm", label: "Passage check" },
+    { id: "h-src", label: "Sources and run details" },
+  ].filter(Boolean) as { id: string; label: string }[];
+
+  const jump = (id: string) => document.getElementById(id)?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+  const dataThrough = meta?.data_current_through ? Object.values(meta.data_current_through).join(", ") : null;
+
   return (
     <article>
+      <div className="page-head">
+        {crumb && <p className="crumb">{crumb}</p>}
+        <p className="eyebrow">{meta?.saved_example ? "Saved example" : meta?.mode === "live" ? "Live answer" : "Answer"}</p>
+        <h1>{report.request}</h1>
+      </div>
+
       <div className="banner" role="status" data-testid="banner">
         {meta?.banner ??
           (meta?.mode === "live"
             ? "Live answer. Written just now by the live pipeline; asking again can give different text."
             : "The backend sent no banner for this answer.")}
         {meta && (
+          <details style={{ marginTop: 8 }}>
+            <summary className="small muted" style={{ cursor: "pointer" }}>Run details</summary>
           <div className="meta-row">
             <span className="pill">mode: {meta.mode}</span>
             <span className="pill">how made: {meta.how_made}</span>
@@ -58,10 +80,39 @@ export default function ReportView({ report }: { report: ReportResponse }) {
                 </span>
               ))}
           </div>
+          </details>
         )}
       </div>
 
-      <h1>{report.request}</h1>
+      <div className="stat-row" data-testid="summary">
+        <div className="stat">
+          <div className="label">Forecast trust</div>
+          <div className="value">
+            {report.horizon_confidence.length ? `${reliable} of ${report.horizon_confidence.length} horizons validated` : "no forecast in this answer"}
+          </div>
+        </div>
+        <div className="stat">
+          <div className="label">Number check</div>
+          <div className="value"><span className={`status ${grounding.status}`}>{grounding.status}</span></div>
+        </div>
+        <div className="stat">
+          <div className="label">Data through</div>
+          <div className="value num">{dataThrough ?? "not reported"}</div>
+        </div>
+      </div>
+
+      <div className="report-layout">
+        <nav className="toc" aria-label="On this page">
+          <h4>On this page</h4>
+          <ul>
+            {sections.map((s) => (
+              <li key={s.id}>
+                <button type="button" onClick={() => jump(s.id)}>{s.label}</button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div>
 
       {report.horizon_confidence.length > 0 && (
         <section className="card" aria-labelledby="h-horizons">
@@ -83,9 +134,7 @@ export default function ReportView({ report }: { report: ReportResponse }) {
       {(heat || crop) && (
         <section className="card" aria-labelledby="h-obs">
           <h2 id="h-obs">What the tools found</h2>
-          <div className="table-wrap">
-            <table>
-              <tbody>
+          <dl className="kv small">
                 {heat && (
                   <>
                     <Fact name="Heat stress: month" value={show(heat.month)} />
@@ -114,9 +163,7 @@ export default function ReportView({ report }: { report: ReportResponse }) {
                     <Fact name="Confidence" value={show(crop.confidence_label)} />
                   </>
                 )}
-              </tbody>
-            </table>
-          </div>
+          </dl>
         </section>
       )}
 
@@ -236,6 +283,8 @@ export default function ReportView({ report }: { report: ReportResponse }) {
           </>
         )}
       </section>
+        </div>
+      </div>
     </article>
   );
 }

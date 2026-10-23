@@ -34,13 +34,17 @@ export default function Report() {
       </div>
     );
   }
-  if (!report) return <p className="muted">Loading the saved example…</p>;
+  if (!report)
+    return (
+      <div aria-busy="true">
+        <p className="sr-only" role="status">Loading the saved example…</p>
+        <div className="skeleton" style={{ minHeight: 56, marginBottom: 16 }} />
+        <div className="skeleton" style={{ minHeight: 220 }} />
+      </div>
+    );
   return (
     <>
-      <p>
-        <Link to="/analyst">← All examples</Link>
-      </p>
-      <ReportView report={report} />
+      <ReportView report={report} crumb={<Link to="/analyst">← Analyst</Link>} />
     </>
   );
 }

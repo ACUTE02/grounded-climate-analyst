@@ -7,6 +7,20 @@ import ErrorBoundary from "./ErrorBoundary";
 export const REPO_URL = "https://github.com/ACUTE02/grounded-climate-analyst";
 export const ADAPTER_URL = "https://huggingface.co/GHOSTBHAIYA/climate-slm-1.5b-sft";
 
+/** A small mark: a sun over a horizon line, above three bars (the three forecast horizons). */
+function BrandMark() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="12" fill="#151b26" />
+      <path d="M15 34a17 17 0 0 1 34 0z" fill="#e0884f" />
+      <rect x="8" y="34" width="48" height="3" fill="#f6f7f9" />
+      <rect x="13" y="42" width="10" height="14" fill="#4aa388" />
+      <rect x="27" y="46" width="10" height="10" fill="#e0ac3f" />
+      <rect x="41" y="50" width="10" height="6" fill="#d05a55" />
+    </svg>
+  );
+}
+
 export default function Layout() {
   const [health, setHealth] = useState<Health | null>(null);
   const [offline, setOffline] = useState(false);
@@ -25,9 +39,13 @@ export default function Layout() {
 
   return (
     <>
+      <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById("main")?.focus(); }}>
+        Skip to content
+      </a>
       <header className="topbar">
         <div className="wrap">
           <NavLink to="/" className="brand">
+            <BrandMark />
             Climate Suite
           </NavLink>
           <nav className="nav" aria-label="Main">
@@ -40,13 +58,15 @@ export default function Layout() {
           <span className="spacer" />
           {health && (
             <span className="pill accent" title={health.note}>
+              <span className="dot" aria-hidden="true" />
               {health.mode} mode
             </span>
           )}
           {offline && <span className="pill warm">backend not reachable</span>}
+          <a className="repo" href={REPO_URL}>Source</a>
         </div>
       </header>
-      <main className="wrap">
+      <main className="wrap" id="main" tabIndex={-1} style={{ outline: "none" }}>
         <ErrorBoundary key={pathname}>
           <Outlet context={{ health, offline }} />
         </ErrorBoundary>

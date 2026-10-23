@@ -11,11 +11,13 @@ export function badgeKind(label: string): { cls: string; title: string } {
 
 interface Props {
   horizons: HorizonConfidence[];
+  /** fewer details per badge (landing preview) */
+  compact?: boolean;
   /** calendar month per horizon, as sent inside tool_outputs.forecast_drought_risk */
   months?: Record<string, string>;
 }
 
-export default function HorizonBadges({ horizons, months = {} }: Props) {
+export default function HorizonBadges({ horizons, months = {}, compact = false }: Props) {
   if (horizons.length === 0) return null;
   return (
     <div className="badges" role="list" aria-label="Forecast horizons">
@@ -31,10 +33,12 @@ export default function HorizonBadges({ horizons, months = {} }: Props) {
             <span className="score" aria-label="skill score">
               {String(h.skill_score)}
             </span>
-            <span className="small muted">{h.label}</span>
-            <span className="small muted">
-              method {h.method} · reliable: {h.reliable ? "yes" : "no"}
-            </span>
+            {!compact && <span className="small muted">{h.label}</span>}
+            {!compact && (
+              <span className="small muted">
+                method {h.method} · reliable: {h.reliable ? "yes" : "no"}
+              </span>
+            )}
           </div>
         );
       })}
