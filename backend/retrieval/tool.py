@@ -10,8 +10,6 @@ Run standalone:  python -m retrieval.tool "your question here"
 
 from __future__ import annotations
 
-import json
-
 from langchain_core.tools import tool
 
 from retrieval import config

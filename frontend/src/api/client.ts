@@ -57,6 +57,7 @@ export const getExamples = () => request<ExamplesResponse>("/examples");
 export const getExample = (id: string) =>
   request<ReportResponse>(`/examples/${encodeURIComponent(id)}`);
 export const getSlmStatus = () => request<SlmStatus>("/slm/status");
+export const getSlmReports = () => request<{ reports: { id: string; label: string }[] }>("/slm/reports");
 export const postSlmAnswer = (context: string, question: string) =>
   request<SlmAnswer>("/slm/answer", {
     method: "POST",

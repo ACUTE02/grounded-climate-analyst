@@ -171,7 +171,7 @@ STEPS: list[Step] = [
     ),
     Step(
         name="ChromaDB retrieval index",
-        why="Embeds and indexes the 9-document corpus so reports can cite sources.",
+        why="Embeds and indexes the source corpus so reports can cite sources.",
         outputs=lambda: [rconfig.CHUNKS_PATH,
                          rconfig.CHROMA_DIR / "chroma.sqlite3"],
         needs_api_key=True,
@@ -301,7 +301,7 @@ def main(argv: list[str] | None = None) -> int:
 
         print("\nSetup complete. Start the API with:")
         print("    uvicorn api.app:app --reload --port 8000")
-        print("Then open http://localhost:8000/app/")
+        print("Then, in frontend/: npm install && npm run dev, and open http://localhost:5173")
         return 0
     print(f"Setup incomplete — still missing: {', '.join(missing)}")
     return 1

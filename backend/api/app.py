@@ -431,25 +431,6 @@ def quota_status() -> dict:
     return quota.demo_status() if demo.is_demo() else quota.status()
 
 
-# --------------------------------------------------------------------------- #
-# The frontend, served by this same app
-# --------------------------------------------------------------------------- #
-# Option (a) of Phase 7 §2.3: mount frontend/ here rather than leaving it to a
-# separate `python -m http.server`. It is three static files with no build step,
-# so serving them costs nothing, and it gives the "one command, whole local
-# site, one port" outcome Phase 6 was aiming at — `uvicorn api.app:app` (or
-# `docker run`) now yields a working UI, not just /docs.
-#
-# Mounted at /app rather than "/" on purpose: mounting at the root would shadow
-# the API's own paths and make the OpenAPI docs harder to reach. Serving it from
-# the same origin also means the UI needs no CORS at all; the CORS middleware
-# above stays for the separate-port development case.
-#
-# The mount is conditional so a checkout without frontend/ (or a partial Docker
-# context) still starts the API instead of crashing at import time.
-_FRONTEND_DIR = fconfig.REPO_ROOT / "frontend"
-if (_FRONTEND_DIR / "index.html").exists():
-    from fastapi.staticfiles import StaticFiles
-
-    app.mount("/app", StaticFiles(directory=_FRONTEND_DIR, html=True),
-              name="frontend")
+# The website is a separate Vite app (frontend/): `npm run dev` for development, nginx in Docker.
+# An earlier version mounted a static frontend at /app here; it pointed at backend/frontend, which does
+# not exist, so it was never active and has been removed.

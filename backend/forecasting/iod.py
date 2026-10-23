@@ -25,7 +25,7 @@ import pandas as pd
 import requests
 
 from forecasting import config
-from forecasting.enso import MISSING_SENTINEL, parse_psl_ascii
+from forecasting.enso import parse_psl_ascii
 
 DMI_URL = "https://psl.noaa.gov/data/timeseries/month/data/dmi.had.long.data"
 DMI_CSV_URL = "https://psl.noaa.gov/data/timeseries/month/data/dmi.had.long.csv"

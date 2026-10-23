@@ -91,6 +91,35 @@ def test_number_fragment_does_not_count_as_a_match():
     assert "4" in result["unverified_numbers"]
 
 
+def test_a_dropped_minus_sign_is_flagged():
+    """The bug this test exists for: an unsigned "0.0145" used to match the digits of
+    a source -0.0145, so a no-skill (negative) score could be reported as positive."""
+    result = check_grounding("The t+3 skill is 0.0145.", {"skill_score": -0.0145}, [])
+    assert not result["grounded"]
+    assert "0.0145" in result["unverified_numbers"]
+
+
+@pytest.mark.parametrize("report", ["The t+3 skill is -0.0145.", "The t+3 skill is −0.0145."])
+def test_a_negative_number_with_either_minus_sign_is_grounded(report):
+    assert check_grounding(report, {"skill_score": -0.0145}, [])["grounded"]
+
+
+def test_a_number_after_a_range_hyphen_still_matches():
+    """'4-5 days' is a range, not minus five: a report saying 5 days is sourced by it."""
+    result = check_grounding("Spells last 5 days.", {}, [{"text": "Spells of 4-5 days are common."}])
+    assert result["grounded"]
+
+
+def test_the_sign_fix_leaves_the_published_checker_scores_unchanged():
+    from evaluation import checker_eval
+    from evaluation import config as econfig
+
+    saved = json.loads(econfig.CHECKER_EVAL_PATH.read_text(encoding="utf-8"))
+    now = checker_eval.evaluate()
+    assert {k: now[k] for k in ("cases", "precision", "recall", "f1")} == \
+        {k: saved[k] for k in ("cases", "precision", "recall", "f1")}
+
+
 def test_rounding_a_source_number_is_allowed():
     result = check_grounding("Skill is +0.26.", {"skill_score": 0.2622}, [])
     assert result["grounded"]

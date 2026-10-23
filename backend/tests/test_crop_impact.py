@@ -12,7 +12,6 @@ not a second env var.
 from __future__ import annotations
 
 import inspect
-import json
 import os
 
 import pytest

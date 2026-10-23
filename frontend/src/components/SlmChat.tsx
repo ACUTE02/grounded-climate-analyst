@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { getExamples, getSlmStatus, postSlmAnswer, postSlmAsk } from "../api/client";
-import type { ExampleItem, SlmStatus } from "../api/types";
+import { getSlmReports, getSlmStatus, postSlmAnswer, postSlmAsk } from "../api/client";
+import type { SlmStatus } from "../api/types";
 
 export const MAX_CONTEXT = 4000;
 export const MAX_QUESTION = 500;
@@ -31,7 +31,7 @@ interface Turn {
 export default function SlmChat() {
   const [status, setStatus] = useState<SlmStatus | null>(null);
   const [source, setSource] = useState<Source>("project");
-  const [reports, setReports] = useState<ExampleItem[]>([]);
+  const [reports, setReports] = useState<{ id: string; label: string }[]>([]);
   const [reportId, setReportId] = useState("");
   const [passage, setPassage] = useState(EXAMPLE_PASSAGE);
   const [question, setQuestion] = useState("");
@@ -43,8 +43,9 @@ export default function SlmChat() {
     getSlmStatus()
       .then(setStatus)
       .catch(() => setStatus({ configured: false, available: false, model: null, message: "" }));
-    getExamples()
-      .then((r) => setReports(Array.isArray(r.examples) ? r.examples : []))
+    // The saved reports, in any mode (in live mode /examples lists request templates, not saved reports).
+    getSlmReports()
+      .then((r) => setReports(Array.isArray(r.reports) ? r.reports : []))
       .catch(() => setReports([]));
   }, []);
 

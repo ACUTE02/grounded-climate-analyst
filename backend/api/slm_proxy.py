@@ -1,8 +1,9 @@
-"""A thin proxy to the optional small language model (SLM) service, for the website's "Try it" card.
+"""A thin proxy to the optional small language model (SLM) service, for the website's SLM chat.
 
     POST /slm/answer   {context, question}  ->  the SLM service's /answer, reduced to answer, refused, model
     POST /slm/ask      {question, report_id | report_text}  ->  the same, answered from a report plus the best-matching
                        source passages (api/slm_context.py builds the context); also returns the sources used
+    GET  /slm/reports  the saved reports /slm/ask can use (in any mode)
     GET  /slm/status   is SLM_URL set, and does the service answer /health
 
 It works in demo mode too: the SLM service is separate from Gemini, so no key and no Gemini call is involved.
@@ -126,9 +127,17 @@ def ask(body: SlmAskRequest) -> dict:
     return {**result, "sources": built["sources"], "truncated": built["truncated"]}
 
 
+@router.get("/reports")
+def reports() -> dict:
+    """The saved reports /slm/ask can use (any mode): the saved examples, by id and label."""
+    from api import demo
+
+    return {"reports": [{"id": item["id"], "label": item["label"]} for item in demo.load_index()]}
+
+
 @router.get("/status")
 def status() -> dict:
-    """Whether the Try-it card can be used. Reads the SLM service's /health only."""
+    """Whether the SLM chat can be used. Reads the SLM service's /health only."""
     url = slm.service_url()
     if url is None:
         return {"configured": False, "available": False, "model": None, "message": UNSET_MESSAGE}

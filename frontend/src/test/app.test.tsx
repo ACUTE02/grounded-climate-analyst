@@ -412,7 +412,7 @@ describe("SLM chat", () => {
     let n = 0;
     mockApi((url, init) => {
       if (url.endsWith("/slm/status")) return { body: up };
-      if (url.endsWith("/examples")) return { body: examples };
+      if (url.endsWith("/slm/reports")) return { body: { reports: examples.examples.map(({ id, label }) => ({ id, label })) } };
       if (url.endsWith("/slm/ask") && init?.method === "POST") {
         n += 1;
         return { body: n === 1
@@ -446,7 +446,7 @@ describe("SLM chat", () => {
   it("project mode posts only the question and the chosen report id to /slm/ask", async () => {
     const fetchMock = mockApi((url, init) => {
       if (url.endsWith("/slm/status")) return { body: up };
-      if (url.endsWith("/examples")) return { body: examples };
+      if (url.endsWith("/slm/reports")) return { body: { reports: examples.examples.map(({ id, label }) => ({ id, label })) } };
       if (url.endsWith("/slm/ask") && init?.method === "POST")
         return { body: { answer: "ok", refused: false, model: "fake-slm", sources: [], truncated: false } };
       return { body: demoHealth };

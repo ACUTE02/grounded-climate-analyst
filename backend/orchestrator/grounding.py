@@ -50,6 +50,13 @@ STRUCTURAL_PATTERNS = (
 
 YEAR_MIN, YEAR_MAX = 1900, 2100
 
+# A typographic minus (U+2212) is a minus: a report writing "−0.0145" means -0.0145.
+UNICODE_MINUS = "−"
+
+
+def _normalise(text: str) -> str:
+    return text.replace(UNICODE_MINUS, "-")
+
 
 def _strip_structural(text: str) -> str:
     for pattern in STRUCTURAL_PATTERNS:
@@ -77,7 +84,7 @@ def _is_ignorable(token: str, value: float) -> bool:
 
 def extract_numbers(text: str) -> list[dict]:
     """Every numeric claim in ``text``, with the structural noise removed."""
-    cleaned = _strip_structural(text)
+    cleaned = _strip_structural(_normalise(text))
     found: list[dict] = []
     for match in NUMBER_RE.finditer(cleaned):
         token = match.group(0)
@@ -101,6 +108,7 @@ def collect_source_numbers(tool_outputs: dict,
     for chunk in retrieved_chunks or []:
         blob += "\n" + str(chunk.get("text", ""))
         blob += "\n" + str(chunk.get("excerpt", ""))
+    blob = _normalise(blob)
 
     values = set()
     for match in NUMBER_RE.finditer(blob):
@@ -119,9 +127,17 @@ def _verbatim_in(token: str, source_blob: str) -> bool:
     so a fabricated "4-month horizon" would be silently accepted by any source
     containing that skill score. Boundaries are enforced so a number only matches
     a number, never a fragment of one.
+
+    The sign counts too: an unsigned "0.0145" must not match the digits of a
+    source "-0.0145", or a dropped minus would turn a negative skill into an
+    apparently positive one. A hyphen between two numbers ("4-5 days") is a
+    range, not a sign, so a number right after it still matches.
     """
-    pattern = re.compile(r"(?<![\d.])" + re.escape(token.rstrip("%"))
-                         + r"(?![\d])")
+    if token[:1] in "+-":
+        lead = r"(?<![\d.])"
+    else:
+        lead = r"(?<![\d.])(?<!(?<![\w.])-)"
+    pattern = re.compile(lead + re.escape(token.rstrip("%")) + r"(?![\d])")
     return bool(pattern.search(source_blob))
 
 

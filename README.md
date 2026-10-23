@@ -22,13 +22,16 @@
 - **Grounded**, meaning every number in a written report is checked by code that does not use an LLM
 - **Honest about gaps**, because unavailable sources and missing data are shown, not filled in
 
+**Who it is for.** People who want a drought, heat or crop-risk reading for Rajasthan or Barmer and need to see how far to trust it: for example an extension officer, an analyst or a student. It is also a worked example of keeping an LLM-written report honest (tools produce the numbers, a mechanical checker verifies them, gaps are stated). It is a research and demonstration project: its forecasts are tested but modest (only the one-month drought forecast is validated), and it is not an operational early-warning service.
+
 This repository holds the backend (Python, FastAPI), the website (React), and a demo mode that runs with no key and no network. A small language model (SLM) service is included as an optional part.
 
 ## ✨ Features
 
 - 🌧️ **Drought forecast with per-horizon labels** — t+1 validated, t+2 weak, t+3 no skill, each with its measured skill score
 - 🌡️ **Observed heat only** — heat forecasting was tested and has no usable skill at any horizon in either region, so it is reported as a null result
-- 🌾 **Crop-impact assessment** — part of the same report
+- 🌾 **Crop-impact assessment** — bajra and wheat: a fixed rule decides which risk binds yield, and a yield-impact figure is read from a sourced table; where the table has no matching entry the report says "no sourced yield-impact estimate available" instead of inventing one
+- 🛰️ **Live outside sources (live mode)** — at report time the backend also fetches IMD's current outlooks, NASA POWER agrometeorology and, with a free key, data.gov.in mandi prices; each is cited by name, kept apart from the project's own numbers, and listed with its reason if it was unavailable
 - ✅ **Mechanical number checker** — every number in a written report is checked against a source, with its own measured precision and recall
 - 📚 **Retrieval over a document corpus (Track A)** — plain dense search is the default; hybrid search and re-ranking were built, measured, and left off
 - 🤖 **Optional small language model step** — asks a fine-tuned 1.5B model about the first retrieved passages; **off by default** and not used to write the report
@@ -74,6 +77,8 @@ This repository holds the backend (Python, FastAPI), the website (React), and a 
          report and does not check its numbers)
 ```
 
+In **live mode** the same report also carries the outside sources above (fetched in parallel under one deadline, never merged into the project's own numbers), and if the number checker flags a figure the writer gets one regeneration before the report is returned with a warning banner.
+
 In **demo mode** there is no live routing or writing: the website shows six saved examples, and any other question gets a plain refusal (HTTP 409).
 
 ## 📁 Project Structure
@@ -81,15 +86,20 @@ In **demo mode** there is no live routing or writing: the website shows six save
 ```
 grounded-climate-analyst/
 ├── backend/
-│   ├── api/                # FastAPI app
-│   ├── demo/               # The six saved examples (demo mode)
-│   ├── retrieval/          # Retrieval and its evaluation results
-│   ├── evaluation/         # Number-checker evaluation
-│   ├── models/             # Forecast manifests (the evidence files)
+│   ├── api/                # FastAPI app: /report, /health, saved examples, quota, SLM proxy
+│   ├── orchestrator/       # LangGraph pipeline, number checker (grounding.py), optional SLM step
+│   ├── forecasting/        # Drought (SPI-3) Ridge models, ENSO/IOD inputs, data snapshot restore
+│   ├── heat/               # Observed heat-wave indicator and the heat-forecast null result
+│   ├── crop_impact/        # Dominant-risk rule, sourced yield table, narrative step
+│   ├── retrieval/          # Corpus build, search (dense default, BM25), live IMD/NASA POWER/data.gov.in fetchers
+│   ├── evaluation/         # Number-checker and faithfulness evaluation
+│   ├── models/             # Saved forecast manifests (the frozen evidence files)
 │   ├── data_snapshot/      # Fixed input data, with manifest.json (source, date, SHA256)
-│   └── scripts/            # setup (python -m scripts.setup)
-├── frontend/               # React website
-├── slm/                    # Small language model service: code, configs, tests
+│   ├── demo/               # The six saved examples (demo mode)
+│   ├── scripts/            # setup, refresh, make_demo_examples, compare_generated, make_data_snapshot
+│   └── tests/
+├── frontend/               # React website (Home, Analyst, SLM, Evidence, About); src/data = evidence read from saved files
+├── slm/                    # Small language model: training code, configs, tests, the serving service
 ├── docker-compose.yml      # Demo mode (profile "slm" for the optional SLM service)
 ├── LICENSE
 └── NOTICE
@@ -214,12 +224,60 @@ The website's SLM page is a chat. Each question is answered from a text the SLM 
 
 The training data is not included in this release (the tests that need it skip when it is missing). The Colab and benchmark scripts and the notebook are kept for reference only: the 0.5B and DPO adapters they refer to were not published.
 
+## 🔌 API
+
+The backend (port 8000; Docker exposes it to the website only, under `/api`). Interactive docs at `/docs` when run directly.
+
+| Endpoint | What it does |
+|---|---|
+| `POST /report` | Answer a question. Demo mode: only the six saved examples (HTTP 409 otherwise). Live mode: the full pipeline; 503 if no Gemini key, 429 on a quota error |
+| `GET /health` | Mode, key present or not, whether models and index exist, how current the data is. Makes no Gemini call |
+| `GET /examples`, `GET /examples/{id}` | The saved examples and their reports |
+| `GET /evaluation` | Summary of the saved number-checker results |
+| `GET /quota` | The app's own count of generation calls today (a floor, not an audit) |
+| `POST /slm/answer` | The SLM answers from a passage you send (at most 4000 characters; question at most 500) |
+| `POST /slm/ask` | The SLM answers from a saved report plus the best-matching corpus passages, chosen by the backend |
+| `GET /slm/reports` | The saved reports the SLM chat can answer from (in any mode) |
+| `GET /slm/status` | Whether `SLM_URL` is set and the service answers |
+
+## 🧰 Scripts and commands
+
+Run from `backend/` unless noted.
+
+| Command | Purpose |
+|---|---|
+| `python -m scripts.setup` | Restore the data snapshot, build the forecast models, build the retrieval index if a key is present. `--check` lists what is missing, `--skip-index`, `--force`, `--refetch` (fresh data from the network) |
+| `python -m retrieval.build` | Build only the retrieval corpus and index (needs a key) |
+| `python -m scripts.refresh` | Pull recent weather and ONI so live forecasts answer about now (no key; the evaluated archive is never touched) |
+| `python -m scripts.make_demo_examples [--live]` | Rebuild the saved examples; `--live` writes reports through Gemini inside the quota |
+| `python -m scripts.compare_generated` | Compare the models `setup` generated with the frozen evidence files (read-only) |
+| `python -m scripts.make_data_snapshot` | One-off: build `data_snapshot/` from existing data files |
+| `python -m orchestrator.graph "question"` | Run the pipeline once from the command line (live mode, uses the key) |
+| `npm run sync-evidence` (in `frontend/`) | Regenerate `frontend/src/data/*.json` from the saved result files; it also reads the SLM README, from the path in `SLM_REPO` |
+
+## ⚙️ Configuration
+
+| Variable | Meaning |
+|---|---|
+| `CLIMATE_SUITE_MODE` | `demo` (default) or `live` |
+| `GEMINI_API_KEY` | Live mode and index build (`GOOGLE_API_KEY` and `GOOGLE_GENAI_API_KEY` are also read) |
+| `DATA_GOV_IN_API_KEY` | Optional: the data.gov.in mandi-price source (`DATA_GOV_API_KEY` also read); without it that source is listed as unavailable |
+| `CLIMATE_SUITE_SLM`, `SLM_URL` | Optional passage-check step in reports (default off) and the address of the SLM service; `SLM_URL` is also needed for the website's SLM chat |
+| `PHASE5_PORT`, `PHASE5_HOST`, `PHASE5_BACKEND`, `PHASE5_MODEL` | The SLM service's port, bind address, backend (`hf`) and model key (`sft_1.5b`) |
+| `RUN_LIVE_ORCHESTRATOR`, `RUN_LIVE_EXTERNAL` | Opt in to the tests that call real services |
+| `VITE_API_BASE` | Where the website finds the backend (build argument; `/api` in Docker, `http://127.0.0.1:8000` by default) |
+
+`backend/.env` is read by the code and is gitignored; `backend/.env.example` holds placeholders only.
+
 ## ⚠️ Known Limits
 
 - The saved examples are snapshots: asking again in live mode can give different text.
 - Three of the four live-written examples carry a number-check "warning" caused by numbers in the system's own notes (a count of characters, a date), which the checker flags on purpose.
 - One example (out of scope) has no written report.
 - Saved forecasts use data through December 2024, because the data snapshot is fixed.
+- "Rajasthan" is one grid point (the Jaipur centroid, 26.9 N 75.8 E) and "Barmer" another (25.75 N 71.38 E): neither is a state-wide or district-wide average. Crops covered: bajra and wheat only.
+- The saved corpus manifest lists 8 documents, of which 6 were usable (two NDMA pages could not be fetched), giving 101 chunks. That is smaller than the 224-chunk corpus the retrieval scores were measured on, and a fresh build can differ again if pages are unreachable.
+- Live mode fetches third-party pages at report time (IMD, NASA POWER, data.gov.in, the corpus pages): any of them can be down, and the report then lists them as unavailable.
 - Not included yet: a measurement of the SLM step, and a 3D view.
 
 ## 🧪 Testing
@@ -237,6 +295,7 @@ The data files in `backend/data_snapshot/` keep the terms of their sources, list
 - **Weather:** Weather data by [Open-Meteo.com](https://open-meteo.com/), licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Changes: the daily values were aggregated to monthly (and columns renamed). Open-Meteo describes its Historical Weather API as based on reanalysis datasets, with ERA5 as the main one; which dataset served each value was not recorded here. Contains modified Copernicus Climate Change Service information 2026. Neither the European Commission nor ECMWF is responsible for any use that may be made of the Copernicus information. Open-Meteo's terms say the free API may only be used for non-commercial purposes (https://open-meteo.com/en/terms); `--refetch` uses that free API.
 - **ENSO (ONI):** obtained from NOAA PSL (NOAA's three-month running mean of ERSST.V5 anomalies in the Nino 3.4 region). Data provided by the NOAA/OAR/PSL, Boulder, Colorado, USA, from their Web site at https://psl.noaa.gov/. PSL says information on its servers is in the public domain unless annotated otherwise (https://psl.noaa.gov/disclaimer/).
 - **Indian Ocean Dipole (DMI):** created by NOAA PSL from HadISST1.1 (its file header says so). HadISST data were obtained from https://www.metoffice.gov.uk/hadobs/hadisst/ and are (c) British Crown Copyright, Met Office, provided under an Open Government Licence. Citation: Rayner et al. (2003), J. Geophys. Res. 108(D14), 4407, doi:10.1029/2002JD002670.
+- **Fetched at report time (live mode only, not stored in this repository):** IMD outlooks, NASA POWER agrometeorology and data.gov.in mandi prices (Ministry of Agriculture & Farmers Welfare). Each is attributed by name in the report; their own terms apply.
 - **Small language model:** the adapter is on Hugging Face ([GHOSTBHAIYA/climate-slm-1.5b-sft](https://huggingface.co/GHOSTBHAIYA/climate-slm-1.5b-sft), Apache-2.0) on the base model Qwen/Qwen2.5-1.5B-Instruct (Apache-2.0).
 
 If you reuse this work, please credit Ayushmaan Gupta and link back to the repository: https://github.com/ACUTE02/grounded-climate-analyst

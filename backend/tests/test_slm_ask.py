@@ -16,6 +16,7 @@ from orchestrator import config
 from retrieval import config as rconfig
 
 client = TestClient(api_app.app)
+REAL_CORPUS_PASSAGES = slm_context.corpus_passages      # kept before the fixture replaces it
 PASSAGES = [{"id": "a", "source": "IMD heat wave FAQ", "text": "A heat wave is declared when the maximum temperature reaches a threshold. " * 4},
             {"id": "b", "source": "SPI guide", "text": "SPI-3 is a three-month standardised precipitation index. " * 4}]
 
@@ -151,3 +152,39 @@ def test_nothing_is_logged(monkeypatch, caplog):
 
 def test_saved_example_files_exist_for_the_test():
     assert demo.load_example("drought_one_month") is not None
+
+
+def test_corpus_passages_unwraps_the_bm25_hit_shape(monkeypatch):
+    """The bug this test exists for: bm25_search returns {id, bm25_score, rank, chunk}, with the passage under "chunk";
+    reading "text" at the top level made the corpus part of the context always empty."""
+    from retrieval import lexical
+
+    hits = [{"id": "a", "bm25_score": 3.2, "rank": 1, "chunk": {"id": "a", "source": "IMD FAQ", "text": "A heat wave is ..."}},
+            {"id": "b", "bm25_score": 1.1, "rank": 2, "chunk": {"id": "b", "source": "Empty", "text": "  "}}]
+    monkeypatch.setattr(lexical, "bm25_search", lambda q, n=4: hits)
+    out = REAL_CORPUS_PASSAGES("what is a heat wave?")
+    assert [c["source"] for c in out] == ["IMD FAQ"]
+
+
+def test_corpus_passages_is_empty_not_an_error_when_the_corpus_is_missing(monkeypatch):
+    from retrieval import lexical
+
+    def missing(q, n=4):
+        raise FileNotFoundError("chunks.jsonl")
+
+    monkeypatch.setattr(lexical, "bm25_search", missing)
+    assert REAL_CORPUS_PASSAGES("q?") == []
+
+
+@pytest.mark.skipif(not rconfig.CHUNKS_PATH.exists(), reason="the corpus (retrieval/chunks.jsonl) is not built here")
+def test_the_real_corpus_gives_passages_for_a_plain_question():
+    out = REAL_CORPUS_PASSAGES("What is a heat wave?")
+    assert out and all(c["text"].strip() for c in out)
+
+
+@pytest.mark.parametrize("mode", ["demo", "live"])
+def test_the_saved_reports_are_listed_in_every_mode(monkeypatch, mode):
+    monkeypatch.setenv("CLIMATE_SUITE_MODE", mode)
+    body = client.get("/slm/reports").json()
+    assert [r["id"] for r in body["reports"]] == [item["id"] for item in demo.load_index()]
+    assert all(r["label"] for r in body["reports"])

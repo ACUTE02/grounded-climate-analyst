@@ -36,13 +36,18 @@ def report_part(example: dict | None, report_text: str | None) -> tuple[str, str
 
 
 def corpus_passages(question: str, n: int = PASSAGES) -> list[dict]:
-    """The best-matching source passages, or [] when the corpus is not built (no error)."""
+    """The best-matching source passages, or [] when the corpus is not built (no error).
+
+    bm25_search returns hits shaped {id, bm25_score, rank, chunk}; the passage itself is in "chunk".
+    """
     try:
         from retrieval.lexical import bm25_search
 
-        return [c for c in bm25_search(question, n=n) if (c.get("text") or "").strip()]
+        hits = bm25_search(question, n=n)
     except Exception:
         return []
+    chunks = [hit.get("chunk") or {} for hit in hits]
+    return [c for c in chunks if (c.get("text") or "").strip()]
 
 
 def build_context(question: str, limit: int, example: dict | None = None, report_text: str | None = None,
